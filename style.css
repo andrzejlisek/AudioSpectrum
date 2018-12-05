@@ -1,0 +1,50 @@
+﻿html { overflow: hidden; }
+body { 
+        font: 10pt Arial, sans-serif; 
+        background: lightgrey;
+        height: 100vh;
+        width: 100%;
+        margin: 0 0;
+}
+
+
+canvas {  
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+}
+
+/* DivTable.com */
+.divTable
+{
+	display: table;
+	width: 100%;
+	height: 100%;
+}
+.divTableRow
+{
+	display: table-row;
+}
+.divTableCell
+{
+	border: 0px solid #999999;
+	display: table-cell;
+	padding: 0px;
+}
+.divTableBody
+{
+	display: table-row-group;
+}
+
+.tool
+{
+	width:100%;
+	height:100%;
+	display:block;
+	padding: 0px;
+	margin: 0px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}

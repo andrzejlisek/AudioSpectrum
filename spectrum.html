@@ -1,0 +1,366 @@
+﻿<!doctype html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta charset="utf-8">
+        <title>Spectrogram</title>
+        <script src="unistorage.js"></script>
+        <script src="core.js"></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body id="app">
+        <div id="Settings" style="overflow:scroll; display:none; z-index:2; position:absolute; left:0px; top:0px; right:0px; bottom:0px; background-color:#000000; width:100%; height:100%; padding:0px; color:white; opacity: 0.8;">
+            <input type="button" value="Close" onclick="SettingBtn(0);">
+            <input type="button" value="Pause" onclick="SettingBtn(9);">
+            <input type="button" value="Fullscreen" onclick="SettingBtn(2);">
+            <input type="button" value="Reset" onclick="SettingBtn(8);">
+            <input type="button" value="Start/Stop" onclick="SettingBtn(1);">
+            <table>
+                <tr>
+                    <td><label for="xCurrentSamplerate">Input sample rate:</label></td>
+                    <td><span id="xCurrentSamplerate"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="xCurrentSamplerateX">Decimated sample rate:</label></td>
+                    <td><span id="xCurrentSamplerateX"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="xScreenSize">Screen size:</label></td>
+                    <td><span id="xScreenSize"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="xCanvasSize">Canvas size:</label></td>
+                    <td><span id="xCanvasSize"></span></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawOrientation">Canvas orientation:</label></td>
+                    <td>
+                        <select id="xSET_DrawOrientation" onchange="SettingBtn(3);">
+                            <option value="0">0</option>
+                            <option value="1">90</option>
+                            <option value="2">180</option>
+                            <option value="3">270</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_SampleDecimation">Sample decimation:</label></td>
+                    <td><input type="text" id="xSET_SampleDecimation" onchange="SettingBtn(4);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_ToolbarPosition">Toolbar position:</label></td>
+                    <td>
+                        <select id="xSET_ToolbarPosition" onchange="SettingBtn(3);">
+                            <option value="0">None</option>
+                            <option value="1">Top 1</option>
+                            <option value="2">Bottom 1</option>
+                            <option value="3">Right 1</option>
+                            <option value="4">Left 1</option>
+                            <option value="5">Top 2</option>
+                            <option value="6">Bottom 2</option>
+                            <option value="7">Right 2</option>
+                            <option value="8">Left 2</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_ToolbarSize">Toolbar size:</label></td>
+                    <td><input type="text" id="xSET_ToolbarSize" onchange="SettingBtn(3);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_MinimumStep">Minimum calculation step:</label></td>
+                    <td>
+                        <select id="xSET_MinimumStep" onchange="SettingBtn(4);">
+                            <option value="3">8</option>
+                            <option value="4">16</option>
+                            <option value="5">32</option>
+                            <option value="6">64</option>
+                            <option value="7">128</option>
+                            <option value="8">256</option>
+                            <option value="9">512</option>
+                            <option value="10">1024</option>
+                            <option value="11">2048</option>
+                            <option value="12">4096</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_CanvasScaleH">Canvas width factor:</label></td>
+                    <td><input type="text" id="xSET_CanvasScaleH" onchange="SettingBtn(3);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_CanvasScaleV">Canvas height factor:</label></td>
+                    <td><input type="text" id="xSET_CanvasScaleV" onchange="SettingBtn(3);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawGamma">Drawing gamma:</label></td>
+                    <td><input type="text" id="xSET_DrawGamma" onchange="SettingBtn(6);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawStripSize">Strip size:</label></td>
+                    <td><input type="text" id="xSET_DrawStripSize" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawStripColorR">Strip color R:</label></td>
+                    <td><input type="text" id="xSET_DrawStripColorR" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawStripColorG">Strip color G:</label></td>
+                    <td><input type="text" id="xSET_DrawStripColorG" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawStripColorB">Strip color B:</label></td>
+                    <td><input type="text" id="xSET_DrawStripColorB" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawOverdriveThreshold">Overdrive threshold:</label></td>
+                    <td><input type="text" id="xSET_DrawOverdriveThreshold" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawOverdriveColorR">Overdrive color R:</label></td>
+                    <td><input type="text" id="xSET_DrawOverdriveColorR" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawOverdriveColorG">Overdrive color G:</label></td>
+                    <td><input type="text" id="xSET_DrawOverdriveColorG" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawOverdriveColorB">Overdrive color B:</label></td>
+                    <td><input type="text" id="xSET_DrawOverdriveColorB" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DrawOverdriveColorA">Overdrive color Alpha:</label></td>
+                    <td><input type="text" id="xSET_DrawOverdriveColorA" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_ButtonFontSize">Font size:</label></td>
+                    <td><input type="text" id="xSET_ButtonFontSize" onchange="SettingBtn(3);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_BufLength">Repaint length [samples]*:</label></td>
+                    <td><input type="text" id="xSET_BufLength" onchange="SettingBtn(4);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_BufTick">Repaint step [samples]:</label></td>
+                    <td><input type="text" id="xSET_BufTick" onchange="SettingBtn(4);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_BufTickMargin">Repaint margin [samples]:</label></td>
+                    <td><input type="text" id="xSET_BufTickMargin" onchange="SettingBtn(4);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AudioBufferLength">Audio buffer size [samples]*:</label></td>
+                    <td>
+                        <select id="xSET_AudioBufferLength" onchange="SettingBtn(7);">
+                            <option value="8">256</option>
+                            <option value="9">512</option>
+                            <option value="10">1024</option>
+                            <option value="11">2048</option>
+                            <option value="12">4096</option>
+                            <option value="13">8192</option>
+                            <option value="14">16384</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AudioMode">Stereo mode:</label></td>
+                    <td>
+                        <select id="xSET_AudioMode" onchange="SettingBtn(4);">
+                            <option value="0">Mix</option>
+                            <option value="1">Left</option>
+                            <option value="2">Right</option>
+                            <option value="3">Difference</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_ImageDataMode">Drawing method*:</label></td>
+                    <td>
+                        <select id="xSET_ImageDataMode" onchange="SettingBtn(7);">
+                            <option value="0">Pixel data</option>
+                            <option value="1">Rectangles</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            *) Changing this parameters requires application restart to take effect.<br>
+            <input type="button" value="Close" onclick="SettingBtn(0);">
+            <input type="button" value="Pause" onclick="SettingBtn(9);">
+            <input type="button" value="Fullscreen" onclick="SettingBtn(2);">
+            <input type="button" value="Reset" onclick="SettingBtn(8);">
+            <input type="button" value="Start/Stop" onclick="SettingBtn(1);">
+            <ul>
+                <li><b>Q</b>, <b>A</b> - Gain</li>
+                <li><b>W</b>, <b>S</b> - Resolution</li>
+                <li><b>E</b>, <b>D</b> - Window</li>
+                <li><b>R</b>, <b>F</b> - Zoom</li>
+                <li><b>T</b>, <b>G</b> - Offsetyh</li>
+                <li><b>Y</b>, <b>H</b> - Step</li>
+                <li><b>U</b>, <b>J</b> - Base</li>
+                <li><b>I</b>, <b>K</b> - Min/Max</li>
+                <li><b>O</b>, <b>L</b> - Lines</li>
+                <li><b>Z</b> - Display</li>
+                <li><b>X</b> - Start/Stop</li>
+            </ul>
+            <input type="button" value="Close" onclick="SettingBtn(0);">
+            <input type="button" value="Pause" onclick="SettingBtn(9);">
+            <input type="button" value="Fullscreen" onclick="SettingBtn(2);">
+            <input type="button" value="Reset" onclick="SettingBtn(8);">
+            <input type="button" value="Start/Stop" onclick="SettingBtn(1);">
+        </div>
+
+
+        <canvas id="wavedisplay" width="256" height="256" style="background: #000000;" onclick="BtnAction(0)"></canvas>
+
+        <div id="ToolbarH1" style="z-index:1; position:absolute; right:0px; bottom:0px; background-color:#000000; width:100%; height:100px; padding:0px; color:white;">
+            <div class="divTable">
+                <div class="divTableBody">
+                    <div class="divTableRow">
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1GainUp" onclick="BtnAction(11);">G+</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1ResoUp" onclick="BtnAction(13);">R+</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1WindUp" onclick="BtnAction(15);">W+</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1ZoomUp" onclick="BtnAction(17);">Z+</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1OffsUp" onclick="BtnAction(19);">O+</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1StepUp" onclick="BtnAction(21);">S+</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1BaseUp" onclick="BtnAction(23);">B+</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1MiMaUp" onclick="BtnAction(25);">M+</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1LineUp" onclick="BtnAction(27);">L+</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1Paus__" onclick="BtnAction(29);">Pause</button></div>
+                    </div>
+                    <div class="divTableRow">
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1GainDn" onclick="BtnAction(10);">G-</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1ResoDn" onclick="BtnAction(12);">R-</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1WindDn" onclick="BtnAction(14);">W-</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1ZoomDn" onclick="BtnAction(16);">Z-</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1OffsDn" onclick="BtnAction(18);">O-</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1StepDn" onclick="BtnAction(20);">S-</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1BaseDn" onclick="BtnAction(22);">B-</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1MiMaDn" onclick="BtnAction(24);">M-</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1LineDn" onclick="BtnAction(26);">L-</button></div>
+                        <div class="divTableCell" style="width:10%;height:50%"><button class="tool" id="BtnH1Mode__" onclick="BtnAction(28);">Disp</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div id="ToolbarV1" style="z-index:1; position:absolute; left:0px; top:0px; background-color:#000000; width:200px; height:100%; padding:0px; color:white;">
+        <div class="divTable">
+            <div class="divTableBody">
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1GainDn" onclick="BtnAction(10);">G-</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1GainUp" onclick="BtnAction(11);">G+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1ResoDn" onclick="BtnAction(12);">R-</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1ResoUp" onclick="BtnAction(13);">R+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1WindDn" onclick="BtnAction(14);">W-</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1WindUp" onclick="BtnAction(15);">W+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1ZoomDn" onclick="BtnAction(16);">Z-</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1ZoomUp" onclick="BtnAction(17);">Z+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1OffsDn" onclick="BtnAction(18);">O-</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1OffsUp" onclick="BtnAction(19);">O+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1StepDn" onclick="BtnAction(20);">S-</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1StepUp" onclick="BtnAction(21);">S+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1BaseDn" onclick="BtnAction(22);">B-</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1BaseUp" onclick="BtnAction(23);">B+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1MiMaDn" onclick="BtnAction(24);">M-</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1MiMaUp" onclick="BtnAction(25);">M+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1LineDn" onclick="BtnAction(26);">L-</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1LineUp" onclick="BtnAction(27);">L+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1Mode__" onclick="BtnAction(28);">Disp</button></div>
+                    <div class="divTableCell" style="width:50%;height:10%"><button class="tool" id="BtnV1Paus__" onclick="BtnAction(29);">Pause</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ToolbarH2" style="z-index:1; position:absolute; right:0px; bottom:0px; background-color:#000000; width:100%; height:100px; padding:0px; color:white;">
+        <div class="divTable">
+            <div class="divTableBody">
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2GainUp" onclick="BtnAction(11);">G+</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2ResoUp" onclick="BtnAction(13);">R+</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2WindUp" onclick="BtnAction(15);">W+</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2ZoomUp" onclick="BtnAction(17);">Z+</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2OffsUp" onclick="BtnAction(19);">O+</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2GainDn" onclick="BtnAction(10);">G-</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2ResoDn" onclick="BtnAction(12);">R-</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2WindDn" onclick="BtnAction(14);">W-</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2ZoomDn" onclick="BtnAction(16);">Z-</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2OffsDn" onclick="BtnAction(18);">O-</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2StepUp" onclick="BtnAction(21);">S+</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2BaseUp" onclick="BtnAction(23);">B+</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2MiMaUp" onclick="BtnAction(25);">M+</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2LineUp" onclick="BtnAction(27);">L+</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2Paus__" onclick="BtnAction(29);">Pause</button></div>
+                </div>
+                <div class="divTableRow">
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2StepDn" onclick="BtnAction(20);">S-</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2BaseDn" onclick="BtnAction(22);">B-</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2MiMaDn" onclick="BtnAction(24);">M-</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2LineDn" onclick="BtnAction(26);">L-</button></div>
+                    <div class="divTableCell" style="width:20%;height:25%"><button class="tool" id="BtnH2Mode__" onclick="BtnAction(28);">Disp</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div id="ToolbarV2" style="z-index:1; position:absolute; left:0px; top:0px; background-color:#000000; width:200px; height:100%; padding:0px; color:white;">
+            <div class="divTable">
+                <div class="divTableBody">
+                    <div class="divTableRow">
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2GainDn" onclick="BtnAction(10);">G-</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2GainUp" onclick="BtnAction(11);">G+</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2StepDn" onclick="BtnAction(20);">S-</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2StepUp" onclick="BtnAction(21);">S+</button></div>
+                    </div>
+                    <div class="divTableRow">
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2ResoDn" onclick="BtnAction(12);">R-</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2ResoUp" onclick="BtnAction(13);">R+</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2BaseDn" onclick="BtnAction(22);">B-</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2BaseUp" onclick="BtnAction(23);">B+</button></div>
+                    </div>
+                    <div class="divTableRow">
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2WindDn" onclick="BtnAction(14);">W-</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2WindUp" onclick="BtnAction(15);">W+</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2MiMaDn" onclick="BtnAction(24);">M-</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2MiMaUp" onclick="BtnAction(25);">M+</button></div>
+                    </div>
+                    <div class="divTableRow">
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2ZoomDn" onclick="BtnAction(16);">Z-</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2ZoomUp" onclick="BtnAction(17);">Z+</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2LineDn" onclick="BtnAction(26);">L-</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2LineUp" onclick="BtnAction(27);">L+</button></div>
+                    </div>
+                    <div class="divTableRow">
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2OffsDn" onclick="BtnAction(18);">O-</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2OffsUp" onclick="BtnAction(19);">O+</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2Mode__" onclick="BtnAction(28);">Disp</button></div>
+                        <div class="divTableCell" style="width:25%;height:20%"><button class="tool" id="BtnV2Paus__" onclick="BtnAction(29);">Pause</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="init.js"></script>
+    </body>
+</html>
