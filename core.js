@@ -33,6 +33,18 @@ if (DataExists("SET_BufTick")) { SET_BufTick = parseInt(DataGet("SET_BufTick"));
 var SET_BufTickMargin = 100;
 if (DataExists("SET_BufTickMargin")) { SET_BufTickMargin = parseInt(DataGet("SET_BufTickMargin")); }
 
+var SET_DispModeLines = 2;
+if (DataExists("SET_DispModeLines")) { SET_DispModeLines = parseInt(DataGet("SET_DispModeLines")); }
+
+var SET_DispModeWaveform = 3;
+if (DataExists("SET_DispModeWaveform")) { SET_DispModeWaveform = parseInt(DataGet("SET_DispModeWaveform")); }
+
+var SET_WaveformBack = 32;
+if (DataExists("SET_WaveformBack")) { SET_WaveformBack = parseInt(DataGet("SET_WaveformBack")); }
+
+var SET_WaveformFore = 256;
+if (DataExists("SET_WaveformFore")) { SET_WaveformFore = parseInt(DataGet("SET_WaveformFore")); }
+
 (function(window)
 {
 
@@ -561,7 +573,7 @@ function AudioCallback(raw)
         {
             I_ = Math.floor(((i * Zoom2) / Zoom1) + LenO);
             datum = 0;
-            if (I_ < Len)
+            if ((I_ >= 0) && (I_ < Len))
             {
                 datum = Math.floor(data[I_]);
             }
@@ -661,10 +673,18 @@ function AudioCallback(raw)
     {
         var CanvasLineY0 = CanvasLineY;
         var CanvasLineH0 = CanvasLine;
-        if (CanvasLine > Zoom_)
+        var OffsetX = Zoom_ - (Zoom_ * DISP_Offs / 64);
+        if (CanvasLine > OffsetX)
         {
-            CanvasLineH0 = Zoom_;
-            CanvasLineY0 = CanvasLineY + CanvasLine - Zoom_;
+            CanvasLineH0 = (Zoom_ > OffsetX) ? OffsetX : Zoom_;
+            CanvasLineY0 = CanvasLineY + CanvasLine - OffsetX;
+        }
+        else
+        {
+            if (DISP_Offs < 0)
+            {
+                CanvasLineH0 = CanvasLine - (OffsetX - Zoom_);
+            }
         }
         if (SET_ImageDataMode == 1)
         {
@@ -1278,11 +1298,12 @@ function SetFFT()
 
     CanvasWX = Math.ceil((CanvasW >> CanvasDrawStepX));
 
-    audioRecorder.Msg({ command: 'fft', DispMode: DISP_VU__, FFT: FFT_, Win: Win_, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: SET_AudioMode, DispSize: (DISP_Line * CanvasWX) - SET_BufTickMargin, BufTick: SET_BufTick });
+    audioRecorder.Msg({ command: 'fft', DispMode: DISP_VU__, FFT: FFT_, Win: Win_, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: SET_AudioMode, DispSize: (DISP_Line * CanvasWX) - SET_BufTickMargin, BufTick: SET_BufTick, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
 }
 
 function BtnAction(Btn)
 {
+    var Temp;
     switch (Btn)
     {
         case 0:
@@ -1321,11 +1342,11 @@ function BtnAction(Btn)
             SetFFT();
             break;
         case 18:
-            DISP_Offs = Limit(DISP_Offs - 1, 0, 64);
+            DISP_Offs = Limit(DISP_Offs - 1, -128, 64);
             SetFFT();
             break;
         case 19:
-            DISP_Offs = Limit(DISP_Offs + 1, 0, 64);
+            DISP_Offs = Limit(DISP_Offs + 1, -128, 64);
             SetFFT();
             break;
         case 20:
@@ -1363,14 +1384,38 @@ function BtnAction(Btn)
             SetLayout();
             break;
         case 28:
-            if (DISP_Mode == 0)
+            Temp = false;
+            switch (SET_DispModeLines)
             {
-                DISP_Mode = 1;
+                case 0: DISP_Mode = 0; Temp = true; break;
+                case 1: DISP_Mode = 1; Temp = true; break;
+                case 2:
+                    if (DISP_Mode == 0)
+                    {
+                        DISP_Mode = 1;
+                    }
+                    else
+                    {
+                        DISP_Mode = 0;
+                        Temp = true;
+                    }
+                break;
             }
-            else
+            if (Temp)
             {
-                DISP_Mode = 0;
                 DISP_VU__++;
+                if ((SET_DispModeWaveform == 0))
+                {
+                    DISP_VU__ = 0;
+                }
+                if ((SET_DispModeWaveform == 1) && (DISP_VU__ == 2))
+                {
+                    DISP_VU__++;
+                }
+                if ((SET_DispModeWaveform == 2) && (DISP_VU__ == 1))
+                {
+                    DISP_VU__++;
+                }
                 if (DISP_VU__ == 3)
                 {
                     DISP_VU__ = 0;
@@ -1489,6 +1534,10 @@ function SettingsShow()
     document.getElementById("xSET_DrawOverdriveColorB").value = SET_DrawOverdriveColorB;
     document.getElementById("xSET_DrawOverdriveColorA").value = SET_DrawOverdriveColorA;
 
+    document.getElementById("xSET_DispModeLines").selectedIndex = SET_DispModeLines;
+    document.getElementById("xSET_DispModeWaveform").selectedIndex = SET_DispModeWaveform;
+    document.getElementById("xSET_WaveformBack").value = SET_WaveformBack;
+    document.getElementById("xSET_WaveformFore").value = SET_WaveformFore;
     document.getElementById("xSET_ButtonFontSize").value = SET_ButtonFontSize;
 
     document.getElementById("xCurrentSamplerate").innerHTML = CurrentSamplerate;
@@ -1543,6 +1592,8 @@ function SettingBtn(Cmd)
             SET_BufLength = Limit(document.getElementById("xSET_BufLength").value, 0, 1000000000);
             SET_BufTick = Limit(document.getElementById("xSET_BufTick").value, 0, 1000);
             SET_BufTickMargin = Limit(document.getElementById("xSET_BufTickMargin").value, 0, 1000);
+            SET_WaveformBack = Limit(document.getElementById("xSET_WaveformBack").value, 0, 65536);
+            SET_WaveformFore = Limit(document.getElementById("xSET_WaveformFore").value, 0, 65536);
 
             DataSet("SET_SampleDecimation", SET_SampleDecimation);
             DataSet("SET_MinimumStep", SET_MinimumStep);
@@ -1555,6 +1606,8 @@ function SettingBtn(Cmd)
             document.getElementById("xSET_BufLength").value = SET_BufLength;
             document.getElementById("xSET_BufTick").value = SET_BufTick;
             document.getElementById("xSET_BufTickMargin").value = SET_BufTickMargin;
+            document.getElementById("xSET_WaveformBack").value = SET_WaveformBack;
+            document.getElementById("xSET_WaveformFore").value = SET_WaveformFore;
 
             SetFFT();
             break;
@@ -1579,6 +1632,8 @@ function SettingBtn(Cmd)
             SET_DrawOverdriveColorA = Limit(document.getElementById("xSET_DrawOverdriveColorA").value, 0, 255);
             SET_ImageDataMode = document.getElementById("xSET_ImageDataMode").selectedIndex;
             SET_DrawOverdriveColorX = 255 - SET_DrawOverdriveColorA;
+            SET_DispModeLines = document.getElementById("xSET_DispModeLines").selectedIndex;
+            SET_DispModeWaveform = document.getElementById("xSET_DispModeWaveform").selectedIndex;
 
             DataSet("SET_AudioBufferLength", SET_AudioBufferLength);
             DataSet("SET_DrawStripSize", SET_DrawStripSize);
@@ -1591,6 +1646,8 @@ function SettingBtn(Cmd)
             DataSet("SET_DrawOverdriveColorB", SET_DrawOverdriveColorB);
             DataSet("SET_DrawOverdriveColorA", SET_DrawOverdriveColorA);
             DataSet("SET_ImageDataMode", SET_ImageDataMode);
+            DataSet("SET_DispModeLines", SET_DispModeLines);
+            DataSet("SET_DispModeWaveform", SET_DispModeWaveform);
 
             document.getElementById("xSET_DrawStripSize").value = SET_DrawStripSize;
             document.getElementById("xSET_DrawStripColorR").value = SET_DrawStripColorR;

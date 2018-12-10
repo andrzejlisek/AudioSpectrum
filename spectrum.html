@@ -129,11 +129,40 @@
                     <td><input type="text" id="xSET_DrawOverdriveColorB" onchange="SettingBtn(7);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_DrawOverdriveColorA">Overdrive color Alpha:</label></td>
+                    <td><label for="xSET_DrawOverdriveColorA">Overdrive opacity:</label></td>
                     <td><input type="text" id="xSET_DrawOverdriveColorA" onchange="SettingBtn(7);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_ButtonFontSize">Font size:</label></td>
+                    <td><label for="xSET_DispModeLines">Display mode lines:</label></td>
+                    <td>
+                        <select id="xSET_DispModeLines" onchange="SettingBtn(7);">
+                            <option value="0">Without half</option>
+                            <option value="1">With half</option>
+                            <option value="2">Both</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_DispModeWaveform">Display waveform:</label></td>
+                    <td>
+                        <select id="xSET_DispModeWaveform" onchange="SettingBtn(7);">
+                            <option value="0">None</option>
+                            <option value="1">Real</option>
+                            <option value="2">Absolute</option>
+                            <option value="3">Both</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_WaveformBack">Waveform background level:</label></td>
+                    <td><input type="text" id="xSET_WaveformBack" onchange="SettingBtn(4);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_WaveformFore">Waveform foreground level:</label></td>
+                    <td><input type="text" id="xSET_WaveformFore" onchange="SettingBtn(4);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_ButtonFontSize">Button font size:</label></td>
                     <td><input type="text" id="xSET_ButtonFontSize" onchange="SettingBtn(3);" size="5"></td>
                 </tr>
                 <tr>
@@ -194,7 +223,7 @@
                 <li><b>W</b>, <b>S</b> - Resolution</li>
                 <li><b>E</b>, <b>D</b> - Window</li>
                 <li><b>R</b>, <b>F</b> - Zoom</li>
-                <li><b>T</b>, <b>G</b> - Offsetyh</li>
+                <li><b>T</b>, <b>G</b> - Offset</li>
                 <li><b>Y</b>, <b>H</b> - Step</li>
                 <li><b>U</b>, <b>J</b> - Base</li>
                 <li><b>I</b>, <b>K</b> - Min/Max</li>

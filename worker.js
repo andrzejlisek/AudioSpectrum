@@ -41,6 +41,9 @@ var BufCounter = 0;
 var BufPerTick = 50;
 var BufOffset = 0;
 
+var WaveformBack = 32;
+var WaveformFore = 256;
+
 
 this.onmessage = function(e)
 {
@@ -67,6 +70,8 @@ this.onmessage = function(e)
                 FFT_WinFactor = e.data.Win;
                 FFT_Init();
             }
+            WaveformBack = e.data.WFBack;
+            WaveformFore = e.data.WFFore;
             FFT_FFT_Mode = e.data.DispMode;
             SpectrumStep = e.data.Step;
             SpectrumGain = e.data.Gain;
@@ -238,14 +243,12 @@ function FFT_FFT1(raw, rawoffset, SampleValue)
     {
         if ((I >= ValMin) && (I <= ValMax))
         {
-            T = 65536;
+            T = WaveformFore;
         }
         else
         {
-            T = 8192;
+            T = WaveformBack;
         }
-
-        T = T / 256;
         T = T * SpectrumGain
         T = T - SpectrumBase;
         if (T > 70000)
@@ -515,10 +518,18 @@ function record(inputBuffer)
             buffers.push(Math.max(SampleValue[0], 0 - SampleValue[1]));
             buffers.push(BufCounter + BufOffset);
             BufCounter++;
-            FFTOffset -= SpectrumStep;
-            if (FFTOffset < 0)
+            if ((FFTOffset <= BufPointer) || ((FFTOffset - SpectrumStep) > BufPointer))
             {
-                FFTOffset = FFTOffset + BufLength;
+                FFTOffset -= SpectrumStep;
+                if (FFTOffset < 0)
+                {
+                    FFTOffset = FFTOffset + BufLength;
+                }
+            }
+            else
+            {
+                ii = BufPerTick;
+                BufCounter = 0;
             }
         }
         if (BufCounter >= BufDisp0)
