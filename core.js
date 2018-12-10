@@ -60,8 +60,9 @@ if (DataExists("SET_WaveformFore")) { SET_WaveformFore = parseInt(DataGet("SET_W
         {
             this.node = this.context.createScriptProcessor(bufferLen, 2, 2);
         }
-   
-        var worker = new Worker("worker.js");
+
+        var worker = new Worker(URL.createObjectURL(new Blob(["("+AudioWorker.toString()+")()"], {type: 'text/javascript'})));
+        // var worker = new Worker("worker.js");
 
         worker.postMessage({
             command: 'init',
@@ -163,7 +164,7 @@ if (DataExists("SET_WaveformFore")) { SET_WaveformFore = parseInt(DataGet("SET_W
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-var audioContext = new AudioContext();
+var audioContext = null;
 var audioInput = null;
 var inputPoint = null;
 var audioRecorder = null;
@@ -743,6 +744,10 @@ function ToggleRecording()
     }
     else
     {
+        if (!audioContext)
+        {
+            audioContext = new AudioContext();
+        }
         IsPaused = false;
         AudioStarted = false;
         if (!navigator.getUserMedia)
@@ -803,16 +808,26 @@ function gotStream(stream)
 
 function ToggleFullScreen()
 {
-    var videoElement = document.getElementById("app");
-    if (!document.mozFullScreen && !document.webkitFullScreen)
+    var VideoElement = document.getElementById("app");
+    if (!document.mozFullScreen && !document.webkitIsFullScreen && !document.fullscreen)
     {
-        if (videoElement.mozRequestFullScreen)
+        if (VideoElement.mozRequestFullScreen)
         {
-            videoElement.mozRequestFullScreen();
+            VideoElement.mozRequestFullScreen();
         }
         else
         {
-            videoElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+            if (VideoElement.webkitRequestFullScreen)
+            {
+                VideoElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+            }
+            else
+            {
+                if (VideoElement.requestFullscreen)
+                {
+                    VideoElement.requestFullscreen();
+                }
+            }
         }
     }
     else
@@ -823,7 +838,17 @@ function ToggleFullScreen()
         }
         else
         {
-            document.webkitCancelFullScreen();
+            if (document.webkitCancelFullScreen)
+            {
+                document.webkitCancelFullScreen();
+            }
+            else
+            {
+                if (document.exitFullscreen)
+                {
+                    document.exitFullscreen();
+                }
+            }
         }
     }
 }
