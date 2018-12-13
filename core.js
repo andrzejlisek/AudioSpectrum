@@ -484,6 +484,15 @@ function DrawRectX3_(X, Y, W)
     }
 }
 
+function AudioCallbackDummy()
+{
+    var buffers = [];
+    buffers.push(0);
+    buffers.push(0);
+    buffers.push(0);
+    AudioCallback(buffers);
+}
+
 function AudioCallback(raw)
 {
     /*if (performance.now() - raw[2] > SET_MaxCallbackLag)
@@ -674,6 +683,21 @@ function AudioCallback(raw)
     {
         var CanvasLineY0 = CanvasLineY;
         var CanvasLineH0 = CanvasLine;
+        if (SET_ImageDataMode == 1)
+        {
+            CanvasContext.fillStyle = DrawPalette[0];
+        }
+        else
+        {
+            CanvasDataR = DrawPaletteR[0];
+            CanvasDataG = DrawPaletteG[0];
+            CanvasDataB = DrawPaletteB[0];
+        }
+        DrawRect(DrawPointer << CanvasDrawStepX, CanvasLineY0, SET_DrawStripSize, CanvasLineH0);
+        if (DISP_Mode == 1)
+        {
+            DrawRect(DrawPointerX << CanvasDrawStepX, CanvasLineY0 + CanvasHalfY, SET_DrawStripSize, CanvasLineH0);
+        }
         var OffsetX = Zoom_ - (Zoom_ * DISP_Offs / 64);
         if (CanvasLine > OffsetX)
         {
@@ -763,19 +787,16 @@ function ToggleRecording()
             navigator.requestAnimationFrame = navigator.webkitRequestAnimationFrame || navigator.mozRequestAnimationFrame;
         }
 
-        navigator.getUserMedia(
+        navigator.mediaDevices.getUserMedia(
         {
             "audio": {
-                "mandatory": {
-                    "googEchoCancellation": "false",
-                    "googAutoGainControl": "false",
-                    "googNoiseSuppression": "false",
-                    "googHighpassFilter": "false"
-                },
-                "optional": []
+                "echoCancellation": false,
+                "noiseSuppression": false,
+                "autoGainControl": false
             },
-        }, gotStream, function(e) {
-            alert('Error getting audio');
+            "video": false
+        }).then(gotStream).catch(function(e) {
+            alert("Error getting audio");
             console.log(e);
         });
     }
@@ -1323,6 +1344,10 @@ function SetFFT()
 
     CanvasWX = Math.ceil((CanvasW >> CanvasDrawStepX));
 
+    if (IsPaused)
+    {
+        AudioCallbackDummy();
+    }
     audioRecorder.Msg({ command: 'fft', DispMode: DISP_VU__, FFT: FFT_, Win: Win_, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: SET_AudioMode, DispSize: (DISP_Line * CanvasWX) - SET_BufTickMargin, BufTick: SET_BufTick, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
 }
 
@@ -1524,11 +1549,7 @@ function DispLayout()
     document.getElementById("xScreenSize").innerHTML = window.innerWidth + "x" + window.innerHeight;
     document.getElementById("xCanvasSize").innerHTML = CanvasW + "x" + CanvasH;
 
-    var buffers = [];
-    buffers.push(0);
-    buffers.push(0);
-    buffers.push(0);
-    AudioCallback(buffers);
+    AudioCallbackDummy();
 }
 
 function SettingsShow()
