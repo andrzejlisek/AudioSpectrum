@@ -1,7 +1,7 @@
 ﻿<!doctype html>
 <html>
     <head>
-        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="utf-8">
         <title>Spectrogram</title>
         <script src="unistorage.js"></script>
@@ -204,7 +204,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_ImageDataMode">Drawing method*:</label></td>
+                    <td><label for="xSET_AudioEchoCancellation">Audio echo cancellation*:</label></td>
+                    <td><input type="checkbox" id="xSET_AudioEchoCancellation" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AudioNoiseSuppression">Audio noise suppression*:</label></td>
+                    <td><input type="checkbox" id="xSET_AudioNoiseSuppression" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AudioAutoGainControl_">Audio auto gain control*:</label></td>
+                    <td><input type="checkbox" id="xSET_AudioAutoGainControl_" onchange="SettingBtn(7);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_ImageDataMode">Drawing method**:</label></td>
                     <td>
                         <select id="xSET_ImageDataMode" onchange="SettingBtn(7);">
                             <option value="0">Pixel data</option>
@@ -213,7 +225,8 @@
                     </td>
                 </tr>
             </table>
-            *) Changing this parameters requires application restart to take effect.<br>
+            *) Changing this parameter requires audio capturing restart using "Start/Stop" button to take effect.<br>
+            **) Changing this parameter requires application restart to take effect.<br>
             <input type="button" value="Close" onclick="SettingBtn(0);">
             <input type="button" value="Pause" onclick="SettingBtn(9);">
             <input type="button" value="Fullscreen" onclick="SettingBtn(2);">

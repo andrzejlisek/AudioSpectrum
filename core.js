@@ -45,6 +45,16 @@ if (DataExists("SET_WaveformBack")) { SET_WaveformBack = parseInt(DataGet("SET_W
 var SET_WaveformFore = 256;
 if (DataExists("SET_WaveformFore")) { SET_WaveformFore = parseInt(DataGet("SET_WaveformFore")); }
 
+var SET_AudioEchoCancellation = false;
+if (DataExists("SET_AudioEchoCancellation")) { SET_AudioEchoCancellation = (parseInt(DataGet("SET_AudioEchoCancellation")) == 1); }
+
+var SET_AudioNoiseSuppression = false;
+if (DataExists("SET_AudioNoiseSuppression")) { SET_AudioNoiseSuppression = (parseInt(DataGet("SET_AudioNoiseSuppression")) == 1); }
+
+var SET_AudioAutoGainControl_ = false;
+if (DataExists("SET_AudioAutoGainControl_")) { SET_AudioAutoGainControl_ = (parseInt(DataGet("SET_AudioAutoGainControl_")) == 1); }
+
+
 (function(window)
 {
 
@@ -790,9 +800,9 @@ function ToggleRecording()
         navigator.mediaDevices.getUserMedia(
         {
             "audio": {
-                "echoCancellation": false,
-                "noiseSuppression": false,
-                "autoGainControl": false
+                "echoCancellation": SET_AudioEchoCancellation,
+                "noiseSuppression": SET_AudioNoiseSuppression,
+                "autoGainControl": SET_AudioAutoGainControl_
             },
             "video": false
         }).then(gotStream).catch(function(e) {
@@ -1585,6 +1595,9 @@ function SettingsShow()
     document.getElementById("xSET_WaveformBack").value = SET_WaveformBack;
     document.getElementById("xSET_WaveformFore").value = SET_WaveformFore;
     document.getElementById("xSET_ButtonFontSize").value = SET_ButtonFontSize;
+    document.getElementById("xSET_AudioEchoCancellation").checked = SET_AudioEchoCancellation;
+    document.getElementById("xSET_AudioNoiseSuppression").checked = SET_AudioNoiseSuppression;
+    document.getElementById("xSET_AudioAutoGainControl_").checked = SET_AudioAutoGainControl_;
 
     document.getElementById("xCurrentSamplerate").innerHTML = CurrentSamplerate;
     document.getElementById("xCurrentSamplerateX").innerHTML = CurrentSamplerate / SET_SampleDecimation;
@@ -1655,6 +1668,9 @@ function SettingBtn(Cmd)
             document.getElementById("xSET_WaveformBack").value = SET_WaveformBack;
             document.getElementById("xSET_WaveformFore").value = SET_WaveformFore;
 
+            document.getElementById("xCurrentSamplerate").innerHTML = CurrentSamplerate;
+            document.getElementById("xCurrentSamplerateX").innerHTML = CurrentSamplerate / SET_SampleDecimation;
+
             SetFFT();
             break;
         case 5:
@@ -1680,6 +1696,9 @@ function SettingBtn(Cmd)
             SET_DrawOverdriveColorX = 255 - SET_DrawOverdriveColorA;
             SET_DispModeLines = document.getElementById("xSET_DispModeLines").selectedIndex;
             SET_DispModeWaveform = document.getElementById("xSET_DispModeWaveform").selectedIndex;
+            SET_AudioEchoCancellation = document.getElementById("xSET_AudioEchoCancellation").checked;
+            SET_AudioNoiseSuppression = document.getElementById("xSET_AudioNoiseSuppression").checked;
+            SET_AudioAutoGainControl_ = document.getElementById("xSET_AudioAutoGainControl_").checked;
 
             DataSet("SET_AudioBufferLength", SET_AudioBufferLength);
             DataSet("SET_DrawStripSize", SET_DrawStripSize);
@@ -1694,6 +1713,9 @@ function SettingBtn(Cmd)
             DataSet("SET_ImageDataMode", SET_ImageDataMode);
             DataSet("SET_DispModeLines", SET_DispModeLines);
             DataSet("SET_DispModeWaveform", SET_DispModeWaveform);
+            DataSet("SET_AudioEchoCancellation", SET_AudioEchoCancellation ? "1" : "0");
+            DataSet("SET_AudioNoiseSuppression", SET_AudioNoiseSuppression ? "1" : "0");
+            DataSet("SET_AudioAutoGainControl_", SET_AudioAutoGainControl_ ? "1" : "0");
 
             document.getElementById("xSET_DrawStripSize").value = SET_DrawStripSize;
             document.getElementById("xSET_DrawStripColorR").value = SET_DrawStripColorR;

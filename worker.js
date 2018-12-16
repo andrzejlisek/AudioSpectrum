@@ -471,6 +471,7 @@
     }
 
     var SpecTemp = [];
+    var FFTOffsetBuf;
 
     function record(inputBuffer)
     {
@@ -481,12 +482,9 @@
         buffers.push(0);
 
         var BufL = inputBuffer[0].length;
-        var BufCount = 0;
+        var BufEntries = 0;
         var FFTOffset;
         var SampleValue = [0, 0];
-
-
-
 
         if (BufIgnited)
         {
@@ -495,12 +493,16 @@
             BufPointer0 = BufPointer;
             BufOffset = 0;
             BufDisp0 = BufDisp;
+            FFTOffsetBuf = BufPointer - FFTSize - (SpectrumStepCounter % SpectrumStep);
+            if (FFTOffsetBuf < 0)
+            {
+                FFTOffsetBuf = FFTOffsetBuf + BufLength;
+            }
         }
 
         if (BufCounter > 0)
         {
-            FFTOffset = BufPointer0 - FFTSize - (BufCounter * SpectrumStep);
-            FFTOffset = FFTOffset + (SpectrumStep - SpectrumStepCounter);
+            FFTOffset = FFTOffsetBuf;
             if (FFTOffset < 0)
             {
                 FFTOffset = FFTOffset + BufLength;
@@ -515,7 +517,7 @@
 
             for (var ii = 0; ii < BufPerTick; ii++)
             {
-                BufCount++;
+                BufEntries++;
                 buffers.push(FFT_FFT(BufData, FFTOffset, SampleValue));
                 buffers.push(Math.max(SampleValue[0], 0 - SampleValue[1]));
                 buffers.push(BufCounter + BufOffset);
@@ -534,13 +536,18 @@
                     BufCounter = 0;
                 }
             }
+            FFTOffsetBuf -= (BufPerTick * SpectrumStep);
+            while (FFTOffsetBuf < 0)
+            {
+                FFTOffsetBuf = FFTOffsetBuf + BufLength;
+            }
             if (BufCounter >= BufDisp0)
             {
                 BufCounter = 0;
             }
         }
 
-        var BufCountX = BufCount;
+        var BufEntriesX = BufEntries;
 
         if (!IsPaused)
         {
@@ -568,7 +575,7 @@
                                 if (SpectrumStepCounter >= SpectrumStep)
                                 {
                                     SpectrumStepCounter = 0;
-                                    BufCount = BufCount + 1;
+                                    BufEntries = BufEntries + 1;
                                     FFTOffset = BufPointer - FFTSize;
                                     if (FFTOffset < 0)
                                     {
@@ -604,7 +611,7 @@
                                 if (SpectrumStepCounter >= SpectrumStep)
                                 {
                                     SpectrumStepCounter = 0;
-                                    BufCount = BufCount + 1;
+                                    BufEntries = BufEntries + 1;
                                     FFTOffset = BufPointer - FFTSize;
                                     if (FFTOffset < 0)
                                     {
@@ -640,7 +647,7 @@
                                 if (SpectrumStepCounter >= SpectrumStep)
                                 {
                                     SpectrumStepCounter = 0;
-                                    BufCount = BufCount + 1;
+                                    BufEntries = BufEntries + 1;
                                     FFTOffset = BufPointer - FFTSize;
                                     if (FFTOffset < 0)
                                     {
@@ -676,7 +683,7 @@
                                 if (SpectrumStepCounter >= SpectrumStep)
                                 {
                                     SpectrumStepCounter = 0;
-                                    BufCount = BufCount + 1;
+                                    BufEntries = BufEntries + 1;
                                     FFTOffset = BufPointer - FFTSize;
                                     if (FFTOffset < 0)
                                     {
@@ -693,11 +700,11 @@
             }
         }
 
-        if (BufCount > 0)
+        if (BufEntries > 0)
         {
-            BufOffset += (BufCount - BufCountX);
-            BufDisp0 -= (BufCount - BufCountX);
-            buffers[1] = BufCount;
+            BufOffset += (BufEntries - BufEntriesX);
+            BufDisp0 -= (BufEntries - BufEntriesX);
+            buffers[1] = BufEntries;
             buffers[2] = performance.now();
             this.postMessage(buffers);
         }
