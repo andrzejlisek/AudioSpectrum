@@ -252,7 +252,7 @@
                 T = WaveformBack;
             }
             T = T * SpectrumGain
-            T = T - SpectrumBase;
+            T = T + SpectrumBase;
             if (T > 70000)
             {
                 T = 70000;
@@ -306,7 +306,7 @@
             real[I] = real[I] / FFT_FourierBase;
             imag[I] = imag[I] / FFT_FourierBase;
             T = Math.sqrt((real[I] * real[I]) + (imag[I] * imag[I])) * SpectrumGain;
-            T = T - SpectrumBase;
+            T = T + SpectrumBase;
             if (T > 70000)
             {
                 T = 70000;

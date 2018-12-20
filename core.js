@@ -54,6 +54,17 @@ if (DataExists("SET_AudioNoiseSuppression")) { SET_AudioNoiseSuppression = (pars
 var SET_AudioAutoGainControl_ = false;
 if (DataExists("SET_AudioAutoGainControl_")) { SET_AudioAutoGainControl_ = (parseInt(DataGet("SET_AudioAutoGainControl_")) == 1); }
 
+var SET_AutoStart = 0;
+if (DataExists("SET_AutoStart")) { SET_AutoStart = parseInt(DataGet("SET_AutoStart")); }
+
+var SET_AutoFullscreen = 0;
+if (DataExists("SET_AutoFullscreen")) { SET_AutoFullscreen = parseInt(DataGet("SET_AutoFullscreen")); }
+
+var BeforeFirst = false;
+if ((SET_AutoStart == 2) || (SET_AutoFullscreen == 2))
+{
+    BeforeFirst = true;
+}
 
 (function(window)
 {
@@ -534,6 +545,7 @@ function AudioCallback(raw)
     var Zoom1;
     var Zoom2;
     var I_;
+    var IsOverdrive_;
     var IsOverdrive;
     var datum;
 
@@ -580,7 +592,7 @@ function AudioCallback(raw)
         LenO = DISP_Offs * (Len / 64);
         Zoom1 = Math.floor(Zoom_ / Len);
         Zoom2 = Math.floor(Len / Zoom_);
-        IsOverdrive = (Overdrive > SET_DrawOverdriveThreshold);
+        IsOverdrive_ = (Overdrive > SET_DrawOverdriveThreshold);
         if (Zoom1 < 1)
         {
             Zoom1 = 1;
@@ -596,11 +608,13 @@ function AudioCallback(raw)
             if ((I_ >= 0) && (I_ < Len))
             {
                 datum = Math.floor(data[I_]);
+                IsOverdrive = IsOverdrive_;
             }
             else
             {
                 IsOverdrive = false;
             }
+
             if (SET_ImageDataMode == 1)
             {
                 if (IsOverdrive)
@@ -1363,6 +1377,21 @@ function SetFFT()
 
 function BtnAction(Btn)
 {
+    if (BeforeFirst)
+    {
+        if (SET_AutoStart == 2)
+        {
+            ToggleRecording();
+        }
+        if (SET_AutoFullscreen == 2)
+        {
+            ToggleFullScreen();
+        }
+        BeforeFirst = false;
+        return;
+    }
+
+
     var Temp;
     switch (Btn)
     {
@@ -1418,11 +1447,11 @@ function BtnAction(Btn)
             SetFFT();
             break;
         case 22:
-            DISP_Base = Limit(DISP_Base - 1, -64, 64);
+            DISP_Base = Limit(DISP_Base - 1, -128, 64);
             SetFFT();
             break;
         case 23:
-            DISP_Base = Limit(DISP_Base + 1, -64, 64);
+            DISP_Base = Limit(DISP_Base + 1, -128, 64);
             SetFFT();
             break;
         case 24:
@@ -1598,6 +1627,8 @@ function SettingsShow()
     document.getElementById("xSET_AudioEchoCancellation").checked = SET_AudioEchoCancellation;
     document.getElementById("xSET_AudioNoiseSuppression").checked = SET_AudioNoiseSuppression;
     document.getElementById("xSET_AudioAutoGainControl_").checked = SET_AudioAutoGainControl_;
+    document.getElementById("xSET_AutoStart").selectedIndex = SET_AutoStart;
+    document.getElementById("xSET_AutoFullscreen").selectedIndex = SET_AutoFullscreen;
 
     document.getElementById("xCurrentSamplerate").innerHTML = CurrentSamplerate;
     document.getElementById("xCurrentSamplerateX").innerHTML = CurrentSamplerate / SET_SampleDecimation;
@@ -1699,6 +1730,8 @@ function SettingBtn(Cmd)
             SET_AudioEchoCancellation = document.getElementById("xSET_AudioEchoCancellation").checked;
             SET_AudioNoiseSuppression = document.getElementById("xSET_AudioNoiseSuppression").checked;
             SET_AudioAutoGainControl_ = document.getElementById("xSET_AudioAutoGainControl_").checked;
+            SET_AutoStart = document.getElementById("xSET_AutoStart").selectedIndex;
+            SET_AutoFullscreen = document.getElementById("xSET_AutoFullscreen").selectedIndex;
 
             DataSet("SET_AudioBufferLength", SET_AudioBufferLength);
             DataSet("SET_DrawStripSize", SET_DrawStripSize);
@@ -1716,6 +1749,8 @@ function SettingBtn(Cmd)
             DataSet("SET_AudioEchoCancellation", SET_AudioEchoCancellation ? "1" : "0");
             DataSet("SET_AudioNoiseSuppression", SET_AudioNoiseSuppression ? "1" : "0");
             DataSet("SET_AudioAutoGainControl_", SET_AudioAutoGainControl_ ? "1" : "0");
+            DataSet("SET_AutoStart", SET_AutoStart);
+            DataSet("SET_AutoFullscreen", SET_AutoFullscreen);
 
             document.getElementById("xSET_DrawStripSize").value = SET_DrawStripSize;
             document.getElementById("xSET_DrawStripColorR").value = SET_DrawStripColorR;

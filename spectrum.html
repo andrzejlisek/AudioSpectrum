@@ -26,11 +26,11 @@
                     <td><span id="xCurrentSamplerateX"></span></td>
                 </tr>
                 <tr>
-                    <td><label for="xScreenSize">Screen size:</label></td>
+                    <td><label for="xScreenSize">Screen resolution:</label></td>
                     <td><span id="xScreenSize"></span></td>
                 </tr>
                 <tr>
-                    <td><label for="xCanvasSize">Canvas size:</label></td>
+                    <td><label for="xCanvasSize">Canvas resolution:</label></td>
                     <td><span id="xCanvasSize"></span></td>
                 </tr>
                 <tr>
@@ -65,7 +65,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_ToolbarSize">Toolbar size:</label></td>
+                    <td><label for="xSET_ToolbarSize">Toolbar button size [pixels]:</label></td>
                     <td><input type="text" id="xSET_ToolbarSize" onchange="SettingBtn(3);" size="5"></td>
                 </tr>
                 <tr>
@@ -94,23 +94,23 @@
                     <td><input type="text" id="xSET_CanvasScaleV" onchange="SettingBtn(3);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_DrawGamma">Drawing gamma:</label></td>
+                    <td><label for="xSET_DrawGamma">Drawing gamma x1000:</label></td>
                     <td><input type="text" id="xSET_DrawGamma" onchange="SettingBtn(6);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_DrawStripSize">Strip size:</label></td>
+                    <td><label for="xSET_DrawStripSize">Pointer strip size:</label></td>
                     <td><input type="text" id="xSET_DrawStripSize" onchange="SettingBtn(7);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_DrawStripColorR">Strip color R:</label></td>
+                    <td><label for="xSET_DrawStripColorR">Pointer strip color R:</label></td>
                     <td><input type="text" id="xSET_DrawStripColorR" onchange="SettingBtn(7);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_DrawStripColorG">Strip color G:</label></td>
+                    <td><label for="xSET_DrawStripColorG">Pointer strip color G:</label></td>
                     <td><input type="text" id="xSET_DrawStripColorG" onchange="SettingBtn(7);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_DrawStripColorB">Strip color B:</label></td>
+                    <td><label for="xSET_DrawStripColorB">Pointer strip color B:</label></td>
                     <td><input type="text" id="xSET_DrawStripColorB" onchange="SettingBtn(7);" size="5"></td>
                 </tr>
                 <tr>
@@ -163,7 +163,7 @@
                     <td><input type="text" id="xSET_WaveformFore" onchange="SettingBtn(4);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_ButtonFontSize">Button font size:</label></td>
+                    <td><label for="xSET_ButtonFontSize">Button font size [points]:</label></td>
                     <td><input type="text" id="xSET_ButtonFontSize" onchange="SettingBtn(3);" size="5"></td>
                 </tr>
                 <tr>
@@ -171,11 +171,11 @@
                     <td><input type="text" id="xSET_BufLength" onchange="SettingBtn(4);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_BufTick">Repaint step [samples]:</label></td>
+                    <td><label for="xSET_BufTick">Repaint step [pixels]:</label></td>
                     <td><input type="text" id="xSET_BufTick" onchange="SettingBtn(4);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_BufTickMargin">Repaint margin [samples]:</label></td>
+                    <td><label for="xSET_BufTickMargin">Repaint margin [pixels]:</label></td>
                     <td><input type="text" id="xSET_BufTickMargin" onchange="SettingBtn(4);" size="5"></td>
                 </tr>
                 <tr>
@@ -196,7 +196,7 @@
                     <td><label for="xSET_AudioMode">Stereo mode:</label></td>
                     <td>
                         <select id="xSET_AudioMode" onchange="SettingBtn(4);">
-                            <option value="0">Mix</option>
+                            <option value="0">Downmix</option>
                             <option value="1">Left</option>
                             <option value="2">Right</option>
                             <option value="3">Difference</option>
@@ -205,15 +205,15 @@
                 </tr>
                 <tr>
                     <td><label for="xSET_AudioEchoCancellation">Audio echo cancellation*:</label></td>
-                    <td><input type="checkbox" id="xSET_AudioEchoCancellation" onchange="SettingBtn(7);" size="5"></td>
+                    <td><input type="checkbox" id="xSET_AudioEchoCancellation" onchange="SettingBtn(7);"></td>
                 </tr>
                 <tr>
                     <td><label for="xSET_AudioNoiseSuppression">Audio noise suppression*:</label></td>
-                    <td><input type="checkbox" id="xSET_AudioNoiseSuppression" onchange="SettingBtn(7);" size="5"></td>
+                    <td><input type="checkbox" id="xSET_AudioNoiseSuppression" onchange="SettingBtn(7);"></td>
                 </tr>
                 <tr>
                     <td><label for="xSET_AudioAutoGainControl_">Audio auto gain control*:</label></td>
-                    <td><input type="checkbox" id="xSET_AudioAutoGainControl_" onchange="SettingBtn(7);" size="5"></td>
+                    <td><input type="checkbox" id="xSET_AudioAutoGainControl_" onchange="SettingBtn(7);"></td>
                 </tr>
                 <tr>
                     <td><label for="xSET_ImageDataMode">Drawing method**:</label></td>
@@ -224,9 +224,29 @@
                         </select>
                     </td>
                 </tr>
+                <tr>
+                    <td><label for="xSET_AutoStart">Auto start**:</label></td>
+                    <td>
+                        <select id="xSET_AutoStart" onchange="SettingBtn(7);">
+                            <option value="0">Off</option>
+                            <option value="1">On</option>
+                            <option value="2">Screen</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AutoFullscreen">Auto fullscreen**:</label></td>
+                    <td>
+                        <select id="xSET_AutoFullscreen" onchange="SettingBtn(7);">
+                            <option value="0">Off</option>
+                            <option value="1">On</option>
+                            <option value="2">Screen</option>
+                        </select>
+                    </td>
+                </tr>
             </table>
-            *) Changing this parameter requires audio capturing restart using "Start/Stop" button to take effect.<br>
-            **) Changing this parameter requires application restart to take effect.<br>
+            *) Changing this parameter requires audio capturing restart using "Start/Stop" button.<br>
+            **) Changing this parameter requires application restart.<br>
             <input type="button" value="Close" onclick="SettingBtn(0);">
             <input type="button" value="Pause" onclick="SettingBtn(9);">
             <input type="button" value="Fullscreen" onclick="SettingBtn(2);">
