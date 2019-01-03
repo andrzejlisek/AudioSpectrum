@@ -37,10 +37,23 @@
                     <td><label for="xSET_DrawOrientation">Canvas orientation:</label></td>
                     <td>
                         <select id="xSET_DrawOrientation" onchange="SettingBtn(3);">
-                            <option value="0">0</option>
-                            <option value="1">90</option>
-                            <option value="2">180</option>
-                            <option value="3">270</option>
+                            <option value="0">0* no flip</option>
+                            <option value="1">90* no flip</option>
+                            <option value="2">180* no flip</option>
+                            <option value="3">270* no flip</option>
+                            <option value="4">0* flip</option>
+                            <option value="5">90* flip</option>
+                            <option value="6">180* flip</option>
+                            <option value="7">270* flip</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_FlipBand">Spectrum band flip:</label></td>
+                    <td>
+                        <select id="xSET_FlipBand" onchange="SettingBtn(3);">
+                            <option value="0">Disabled</option>
+                            <option value="1">Enabled</option>
                         </select>
                     </td>
                 </tr>
@@ -193,34 +206,65 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_AudioMode">Stereo mode:</label></td>
+                    <td><label for="xSET_AudioModeR">Stereo mode R:</label></td>
                     <td>
-                        <select id="xSET_AudioMode" onchange="SettingBtn(4);">
-                            <option value="0">Downmix</option>
-                            <option value="1">Left</option>
-                            <option value="2">Right</option>
-                            <option value="3">Difference</option>
+                        <select id="xSET_AudioModeR" onchange="SettingBtn(4);">
+                            <option value="0">Mid</option>
+                            <option value="1">Side</option>
+                            <option value="2">Left</option>
+                            <option value="3">Right</option>
+                            <option value="4">None</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AudioModeG">Stereo mode G:</label></td>
+                    <td>
+                        <select id="xSET_AudioModeG" onchange="SettingBtn(4);">
+                            <option value="0">Mid</option>
+                            <option value="1">Side</option>
+                            <option value="2">Left</option>
+                            <option value="3">Right</option>
+                            <option value="4">None</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AudioModeB">Stereo mode B:</label></td>
+                    <td>
+                        <select id="xSET_AudioModeB" onchange="SettingBtn(4);">
+                            <option value="0">Mid</option>
+                            <option value="1">Side</option>
+                            <option value="2">Left</option>
+                            <option value="3">Right</option>
+                            <option value="4">None</option>
                         </select>
                     </td>
                 </tr>
                 <tr>
                     <td><label for="xSET_AudioEchoCancellation">Audio echo cancellation*:</label></td>
-                    <td><input type="checkbox" id="xSET_AudioEchoCancellation" onchange="SettingBtn(7);"></td>
+                    <td>
+                        <select id="xSET_AudioEchoCancellation" onchange="SettingBtn(7);">
+                            <option value="0">Disabled</option>
+                            <option value="1">Enabled</option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td><label for="xSET_AudioNoiseSuppression">Audio noise suppression*:</label></td>
-                    <td><input type="checkbox" id="xSET_AudioNoiseSuppression" onchange="SettingBtn(7);"></td>
+                    <td>
+                        <select id="xSET_AudioNoiseSuppression" onchange="SettingBtn(7);">
+                            <option value="0">Disabled</option>
+                            <option value="1">Enabled</option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td><label for="xSET_AudioAutoGainControl_">Audio auto gain control*:</label></td>
-                    <td><input type="checkbox" id="xSET_AudioAutoGainControl_" onchange="SettingBtn(7);"></td>
-                </tr>
-                <tr>
-                    <td><label for="xSET_ImageDataMode">Drawing method**:</label></td>
                     <td>
-                        <select id="xSET_ImageDataMode" onchange="SettingBtn(7);">
-                            <option value="0">Pixel data</option>
-                            <option value="1">Rectangles</option>
+                        <select id="xSET_AudioAutoGainControl_" onchange="SettingBtn(7);">
+                            <option value="0">Disabled</option>
+                            <option value="1">Enabled</option>
                         </select>
                     </td>
                 </tr>
@@ -228,8 +272,8 @@
                     <td><label for="xSET_AutoStart">Auto start**:</label></td>
                     <td>
                         <select id="xSET_AutoStart" onchange="SettingBtn(7);">
-                            <option value="0">Off</option>
-                            <option value="1">On</option>
+                            <option value="0">Disabled</option>
+                            <option value="1">Enabled</option>
                             <option value="2">Screen</option>
                         </select>
                     </td>
@@ -238,8 +282,8 @@
                     <td><label for="xSET_AutoFullscreen">Auto fullscreen**:</label></td>
                     <td>
                         <select id="xSET_AutoFullscreen" onchange="SettingBtn(7);">
-                            <option value="0">Off</option>
-                            <option value="1">On</option>
+                            <option value="0">Disabled</option>
+                            <option value="1">Enabled</option>
                             <option value="2">Screen</option>
                         </select>
                     </td>

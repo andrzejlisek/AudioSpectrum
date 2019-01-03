@@ -11,15 +11,22 @@
     var FFT_FourierBase = 1024;
     var FFT_FourierWindow = 3;
     var FFT_WinFactor = 1024;
+    var FFT_Decimation = 1;
 
 
     var IsPaused = false;
 
-    var AudioMode = 0;
+    var AudioModeM = false;
+    var AudioModeS = false;
+    var AudioModeL = false;
+    var AudioModeR = false;
 
     var sampleRate;
     var SampleDecimation = 1;
-    var SampleDecimationBuf = 0;
+    var SampleDecimationBufM = 0;
+    var SampleDecimationBufS = 0;
+    var SampleDecimationBufL = 0;
+    var SampleDecimationBufR = 0;
     var SampleDecimationCounter = 0;
 
     var SpectrumStep = 32;
@@ -30,7 +37,10 @@
     var SpectrumMinMaxX = 0;
 
 
-    var BufData = [];
+    var BufDataM = [];
+    var BufDataS = [];
+    var BufDataL = [];
+    var BufDataR = [];
     var BufPointer = 0;
     var BufLength = 10000000;
 
@@ -65,13 +75,22 @@
                 break;
             case 'fft':
                 SampleDecimation = e.data.Decimation;
-                AudioMode = e.data.AudioMode;
+                AudioModeM = false;
+                AudioModeS = false;
+                AudioModeL = false;
+                AudioModeR = false;
+                var AudioModeTemp = e.data.AudioMode;
+                if (AudioModeTemp >= 8) { AudioModeR = true; AudioModeTemp = AudioModeTemp - 8; }
+                if (AudioModeTemp >= 4) { AudioModeL = true; AudioModeTemp = AudioModeTemp - 4; }
+                if (AudioModeTemp >= 2) { AudioModeS = true; AudioModeTemp = AudioModeTemp - 2; }
+                if (AudioModeTemp >= 1) { AudioModeM = true; AudioModeTemp = AudioModeTemp - 1; }
                 if ((FFT_FourierBase != e.data.FFT) || (FFT_WinFactor != e.data.Win))
                 {
                     FFT_FourierBase = e.data.FFT;
                     FFT_WinFactor = e.data.Win;
                     FFT_Init();
                 }
+                FFT_Decimation = e.data.FFTDecimation;
                 WaveformBack = e.data.WFBack;
                 WaveformFore = e.data.WFFore;
                 FFT_FFT_Mode = e.data.DispMode;
@@ -100,7 +119,10 @@
         BufPointer = 0;
         for (var I = 0; I < BufLength; I++)
         {
-            BufData[I] = 0;
+            BufDataM[I] = 0;
+            BufDataS[I] = 0;
+            BufDataL[I] = 0;
+            BufDataR[I] = 0;
         }
     }
 
@@ -189,13 +211,22 @@
 
     var FFT_FFT_Mode = 0;
 
-    function FFT_FFT(raw, rawoffset, SampleValue)
+    var FFT_Dummy;
+
+    function FFT_FFT(raw, rawoffset, SampleValue, PerformOp)
     {
-        switch(FFT_FFT_Mode)
+        if (PerformOp)
         {
-            case 0: return FFT_FFT0(raw, rawoffset, SampleValue);
-            case 1: return FFT_FFT1(raw, rawoffset, SampleValue);
-            case 2: return FFT_FFT1(raw, rawoffset, SampleValue);
+            switch(FFT_FFT_Mode)
+            {
+                case 0: return FFT_FFT0(raw, rawoffset, SampleValue);
+                case 1: return FFT_FFT1(raw, rawoffset, SampleValue);
+                case 2: return FFT_FFT1(raw, rawoffset, SampleValue);
+            }
+        }
+        else
+        {
+            return FFT_Dummy;
         }
     }
 
@@ -206,8 +237,6 @@
         {
             SerieSize = SpectrumStep;
         }
-        SampleValue[0] = 0;
-        SampleValue[1] = 0;
         rawoffset = rawoffset + FFT_FourierBase - 1;
         if (rawoffset >= BufLength)
         {
@@ -284,8 +313,6 @@
 
         var I;
         var T;
-        SampleValue[0] = 0;
-        SampleValue[1] = 0;
         for (I = 0; I < FFT_FourierBase; I++)
         {
             T = raw[I + rawoffset];
@@ -321,6 +348,7 @@
             raw0[I] = T;
         }
 
+        var rawX;
         if (SpectrumMinMax != 0)
         {
             var rawX = new Float32Array(FFT_FourierBase);
@@ -377,17 +405,40 @@
                     }
                 }
             }
-            return rawX;
         }
         else
         {
-            return raw0;
+            rawX = raw0;
         }
+        if (FFT_Decimation > 1)
+        {
+            var I_, T;
+            I_ = FFT_Decimation;
+            T = 0;
+            for (I = (FFT_FourierBase - 1); I >= 0; I--)
+            {
+                T = T + rawX[I];
+                I_--;
+                if (I_ == 0)
+                {
+                    I_ = FFT_Decimation;
+                    rawX[I] = T / FFT_Decimation;
+                    T = 0;
+                }
+            }
+        }
+        return rawX;
     }
 
 
     function FFT_Init()
     {
+        FFT_Dummy = new Float32Array(FFT_FourierBase);
+        for (I = 0; I < FFT_FourierBase; I++)
+        {
+            FFT_Dummy[I] = 0;
+        }
+
         FFT_transform_radix2_init(FFT_FourierBase);
         var FourierBaseX = FFT_FourierBase / 2;
         var WinT = Math.round((FourierBaseX * (1024.0 - FFT_WinFactor)) / 1024.0);
@@ -466,7 +517,10 @@
 
         FFT_Init();
 
-        BufData = new Float32Array(BufLength + BufLength);
+        BufDataM = new Float32Array(BufLength + BufLength);
+        BufDataS = new Float32Array(BufLength + BufLength);
+        BufDataL = new Float32Array(BufLength + BufLength);
+        BufDataR = new Float32Array(BufLength + BufLength);
         BufPointer = 0;
     }
 
@@ -518,7 +572,13 @@
             for (var ii = 0; ii < BufPerTick; ii++)
             {
                 BufEntries++;
-                buffers.push(FFT_FFT(BufData, FFTOffset, SampleValue));
+                SampleValue[0] = 0;
+                SampleValue[1] = 0;
+                buffers.push(FFT_FFT(BufDataM, FFTOffset, SampleValue, AudioModeM));
+                buffers.push(FFT_FFT(BufDataS, FFTOffset, SampleValue, AudioModeS));
+                buffers.push(FFT_FFT(BufDataL, FFTOffset, SampleValue, AudioModeL));
+                buffers.push(FFT_FFT(BufDataR, FFTOffset, SampleValue, AudioModeR));
+                buffers.push(FFT_Dummy);
                 buffers.push(Math.max(SampleValue[0], 0 - SampleValue[1]));
                 buffers.push(BufCounter + BufOffset);
                 BufCounter++;
@@ -551,152 +611,59 @@
 
         if (!IsPaused)
         {
-            switch (AudioMode)
+            for (var i = 0; i < BufL; i++)
             {
-                case 0:
+                SampleDecimationBufM += ((inputBuffer[0][i] + inputBuffer[1][i]) / 2.0);
+                SampleDecimationBufS += ((inputBuffer[0][i] - inputBuffer[1][i]) / 2.0);
+                SampleDecimationBufL += inputBuffer[0][i];
+                SampleDecimationBufR += inputBuffer[1][i];
+
+                SampleDecimationCounter++;
+                if (SampleDecimationCounter >= SampleDecimation)
+                {
+                    SampleDecimationCounter = 0;
+                    BufDataM[BufPointer] = SampleDecimationBufM / SampleDecimation;
+                    BufDataS[BufPointer] = SampleDecimationBufS / SampleDecimation;
+                    BufDataL[BufPointer] = SampleDecimationBufL / SampleDecimation;
+                    BufDataR[BufPointer] = SampleDecimationBufR / SampleDecimation;
+                    SampleDecimationBufM = 0;
+                    SampleDecimationBufS = 0;
+                    SampleDecimationBufL = 0;
+                    SampleDecimationBufR = 0;
+                    BufDataM[BufPointer] = BufDataM[BufPointer] * 32768.0;
+                    BufDataS[BufPointer] = BufDataS[BufPointer] * 32768.0;
+                    BufDataL[BufPointer] = BufDataL[BufPointer] * 32768.0;
+                    BufDataR[BufPointer] = BufDataR[BufPointer] * 32768.0;
+                    BufDataM[BufPointer + BufLength] = BufDataM[BufPointer];
+                    BufDataS[BufPointer + BufLength] = BufDataS[BufPointer];
+                    BufDataL[BufPointer + BufLength] = BufDataL[BufPointer];
+                    BufDataR[BufPointer + BufLength] = BufDataR[BufPointer];
+                    BufPointer++;
+                    if (BufPointer >= BufLength)
                     {
-                        for (var i = 0; i < BufL; i++)
-                        {
-                            SampleDecimationBuf += ((inputBuffer[0][i] + inputBuffer[1][i]) / 2.0);
-                            SampleDecimationCounter++;
-                            if (SampleDecimationCounter >= SampleDecimation)
-                            {
-                                SampleDecimationCounter = 0;
-                                BufData[BufPointer] = SampleDecimationBuf / SampleDecimation;
-                                SampleDecimationBuf = 0;
-                                BufData[BufPointer] = BufData[BufPointer] * 32768.0;
-                                BufData[BufPointer + BufLength] = BufData[BufPointer];
-                                BufPointer++;
-                                if (BufPointer >= BufLength)
-                                {
-                                    BufPointer = 0;
-                                }
-                                SpectrumStepCounter++;
-                                if (SpectrumStepCounter >= SpectrumStep)
-                                {
-                                    SpectrumStepCounter = 0;
-                                    BufEntries = BufEntries + 1;
-                                    FFTOffset = BufPointer - FFTSize;
-                                    if (FFTOffset < 0)
-                                    {
-                                        FFTOffset = FFTOffset + BufLength;
-                                    }
-                                    buffers.push(FFT_FFT(BufData, FFTOffset, SampleValue));
-                                    buffers.push(Math.max(SampleValue[0], 0 - SampleValue[1]));
-                                    buffers.push(0);
-                                }
-                            }
-                        }
+                        BufPointer = 0;
                     }
-                    break;
-                case 1:
+                    SpectrumStepCounter++;
+                    if (SpectrumStepCounter >= SpectrumStep)
                     {
-                        for (var i = 0; i < BufL; i++)
+                        SpectrumStepCounter = 0;
+                        BufEntries = BufEntries + 1;
+                        FFTOffset = BufPointer - FFTSize;
+                        if (FFTOffset < 0)
                         {
-                            SampleDecimationBuf += inputBuffer[0][i];
-                            SampleDecimationCounter++;
-                            if (SampleDecimationCounter >= SampleDecimation)
-                            {
-                                SampleDecimationCounter = 0;
-                                BufData[BufPointer] = SampleDecimationBuf / SampleDecimation;
-                                SampleDecimationBuf = 0;
-                                BufData[BufPointer] = BufData[BufPointer] * 32768.0;
-                                BufData[BufPointer + BufLength] = BufData[BufPointer];
-                                BufPointer++;
-                                if (BufPointer >= BufLength)
-                                {
-                                    BufPointer = 0;
-                                }
-                                SpectrumStepCounter++;
-                                if (SpectrumStepCounter >= SpectrumStep)
-                                {
-                                    SpectrumStepCounter = 0;
-                                    BufEntries = BufEntries + 1;
-                                    FFTOffset = BufPointer - FFTSize;
-                                    if (FFTOffset < 0)
-                                    {
-                                        FFTOffset = FFTOffset + BufLength;
-                                    }
-                                    buffers.push(FFT_FFT(BufData, FFTOffset, SampleValue));
-                                    buffers.push(Math.max(SampleValue[0], 0 - SampleValue[1]));
-                                    buffers.push(0);
-                                }
-                            }
+                            FFTOffset = FFTOffset + BufLength;
                         }
+                        SampleValue[0] = 0;
+                        SampleValue[1] = 0;
+                        buffers.push(FFT_FFT(BufDataM, FFTOffset, SampleValue, AudioModeM));
+                        buffers.push(FFT_FFT(BufDataS, FFTOffset, SampleValue, AudioModeS));
+                        buffers.push(FFT_FFT(BufDataL, FFTOffset, SampleValue, AudioModeL));
+                        buffers.push(FFT_FFT(BufDataR, FFTOffset, SampleValue, AudioModeR));
+                        buffers.push(FFT_Dummy);
+                        buffers.push(Math.max(SampleValue[0], 0 - SampleValue[1]));
+                        buffers.push(0);
                     }
-                    break;
-                case 2:
-                    {
-                        for (var i = 0; i < BufL; i++)
-                        {
-                            SampleDecimationBuf += inputBuffer[1][i];
-                            SampleDecimationCounter++;
-                            if (SampleDecimationCounter >= SampleDecimation)
-                            {
-                                SampleDecimationCounter = 0;
-                                BufData[BufPointer] = SampleDecimationBuf / SampleDecimation;
-                                SampleDecimationBuf = 0;
-                                BufData[BufPointer] = BufData[BufPointer] * 32768.0;
-                                BufData[BufPointer + BufLength] = BufData[BufPointer];
-                                BufPointer++;
-                                if (BufPointer >= BufLength)
-                                {
-                                    BufPointer = 0;
-                                }
-                                SpectrumStepCounter++;
-                                if (SpectrumStepCounter >= SpectrumStep)
-                                {
-                                    SpectrumStepCounter = 0;
-                                    BufEntries = BufEntries + 1;
-                                    FFTOffset = BufPointer - FFTSize;
-                                    if (FFTOffset < 0)
-                                    {
-                                        FFTOffset = FFTOffset + BufLength;
-                                    }
-                                    buffers.push(FFT_FFT(BufData, FFTOffset, SampleValue));
-                                    buffers.push(Math.max(SampleValue[0], 0 - SampleValue[1]));
-                                    buffers.push(0);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case 3:
-                    {
-                        for (var i = 0; i < BufL; i++)
-                        {
-                            SampleDecimationBuf += ((inputBuffer[0][i] - inputBuffer[1][i]) / 2.0);
-                            SampleDecimationCounter++;
-                            if (SampleDecimationCounter >= SampleDecimation)
-                            {
-                                SampleDecimationCounter = 0;
-                                BufData[BufPointer] = SampleDecimationBuf / SampleDecimation;
-                                SampleDecimationBuf = 0;
-                                BufData[BufPointer] = BufData[BufPointer] * 32768.0;
-                                BufData[BufPointer + BufLength] = BufData[BufPointer];
-                                BufPointer++;
-                                if (BufPointer >= BufLength)
-                                {
-                                    BufPointer = 0;
-                                }
-                                SpectrumStepCounter++;
-                                if (SpectrumStepCounter >= SpectrumStep)
-                                {
-                                    SpectrumStepCounter = 0;
-                                    BufEntries = BufEntries + 1;
-                                    FFTOffset = BufPointer - FFTSize;
-                                    if (FFTOffset < 0)
-                                    {
-                                        FFTOffset = FFTOffset + BufLength;
-                                    }
-                                    buffers.push(FFT_FFT(BufData, FFTOffset, SampleValue));
-                                    buffers.push(Math.max(SampleValue[0], 0 - SampleValue[1]));
-                                    buffers.push(0);
-                                }
-                            }
-                        }
-                    }
-                    break;
+                }
             }
         }
 
