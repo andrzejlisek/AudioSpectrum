@@ -37,14 +37,14 @@
                     <td><label for="xSET_DrawOrientation">Canvas orientation:</label></td>
                     <td>
                         <select id="xSET_DrawOrientation" onchange="SettingBtn(3);">
-                            <option value="0">0* no flip</option>
-                            <option value="1">90* no flip</option>
-                            <option value="2">180* no flip</option>
-                            <option value="3">270* no flip</option>
-                            <option value="4">0* flip</option>
-                            <option value="5">90* flip</option>
-                            <option value="6">180* flip</option>
-                            <option value="7">270* flip</option>
+                            <option value="0">0&#176; no flip</option>
+                            <option value="1">90&#176; no flip</option>
+                            <option value="2">180&#176; no flip</option>
+                            <option value="3">270&#176; no flip</option>
+                            <option value="4">0&#176; flip</option>
+                            <option value="5">90&#176; flip</option>
+                            <option value="6">180&#176; flip</option>
+                            <option value="7">270&#176; flip</option>
                         </select>
                     </td>
                 </tr>
@@ -82,19 +82,35 @@
                     <td><input type="text" id="xSET_ToolbarSize" onchange="SettingBtn(3);" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_MinimumStep">Minimum calculation step:</label></td>
+                    <td><label for="xSET_MinimumStep">Decimate below step:</label></td>
                     <td>
                         <select id="xSET_MinimumStep" onchange="SettingBtn(4);">
-                            <option value="3">8</option>
-                            <option value="4">16</option>
-                            <option value="5">32</option>
-                            <option value="6">64</option>
-                            <option value="7">128</option>
-                            <option value="8">256</option>
-                            <option value="9">512</option>
-                            <option value="10">1024</option>
-                            <option value="11">2048</option>
-                            <option value="12">4096</option>
+                            <option value="0">8</option>
+                            <option value="1">16</option>
+                            <option value="2">32</option>
+                            <option value="3">64</option>
+                            <option value="4">128</option>
+                            <option value="5">256</option>
+                            <option value="6">512</option>
+                            <option value="7">1024</option>
+                            <option value="8">2048</option>
+                            <option value="9">4096</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_MaximumResolution">Decimate above resolution:</label></td>
+                    <td>
+                        <select id="xSET_MaximumResolution" onchange="SettingBtn(4);">
+                            <option value="0">32</option>
+                            <option value="1">64</option>
+                            <option value="2">128</option>
+                            <option value="3">256</option>
+                            <option value="4">512</option>
+                            <option value="5">1024</option>
+                            <option value="6">2048</option>
+                            <option value="7">4096</option>
+                            <option value="8">8192</option>
                         </select>
                     </td>
                 </tr>
@@ -206,7 +222,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_AudioModeR">Stereo mode R:</label></td>
+                    <td><label for="xSET_AudioModeR">Audio mode R:</label></td>
                     <td>
                         <select id="xSET_AudioModeR" onchange="SettingBtn(4);">
                             <option value="0">Mid</option>
@@ -218,7 +234,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_AudioModeG">Stereo mode G:</label></td>
+                    <td><label for="xSET_AudioGainR">Audio gain R x1000:</label></td>
+                    <td><input type="text" id="xSET_AudioGainR" onchange="SettingBtn(4);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AudioModeG">Audio mode G:</label></td>
                     <td>
                         <select id="xSET_AudioModeG" onchange="SettingBtn(4);">
                             <option value="0">Mid</option>
@@ -230,7 +250,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_AudioModeB">Stereo mode B:</label></td>
+                    <td><label for="xSET_AudioGainG">Audio gain G x1000:</label></td>
+                    <td><input type="text" id="xSET_AudioGainG" onchange="SettingBtn(4);" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AudioModeB">Audio mode B:</label></td>
                     <td>
                         <select id="xSET_AudioModeB" onchange="SettingBtn(4);">
                             <option value="0">Mid</option>
@@ -240,6 +264,10 @@
                             <option value="4">None</option>
                         </select>
                     </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_AudioGainB">Audio gain B x1000:</label></td>
+                    <td><input type="text" id="xSET_AudioGainB" onchange="SettingBtn(4);" size="5"></td>
                 </tr>
                 <tr>
                     <td><label for="xSET_AudioEchoCancellation">Audio echo cancellation*:</label></td>

@@ -52,7 +52,8 @@ The available setting parameters are following:
 * __Sample decimation__ - Samplerate divider to get lower audio sample, which requires lower performance, the value of input samples are averaged.
 * __Toolbar position__ - Visibility and position of toolbar on main screen. It is possible to display 10x2 layout or 5x4 layout.
 * __Toolbar button size__ - One button size of tool bar. It changes, how big area of screen is occupied by toolbar.
-* __Minimum calculation step__ - This step value, if spectrum is calculated for every step. If step size is lower than this value, the spectrum will repeated, so performance requirement will be lower, but spectrum time detail display will be slightly lower. This value is usable in displaying lower spectrum steps with fast drawing, when the lover spectrum steps than this value will require only slighty higher performance.
+* __Decimate below step__ - Minimal step value, when spectrum is calculated for every step. If step size is less than this value, the spectrum will be repeated, so performance requirement will be lower, but spectrum time detail display will be slightly lower. This value is usable in displaying lower spectrum steps with fast drawing, when the lower spectrum steps than this value will require only slighty higher performance.
+* __Decimate above resolution__ - Maximum resolution value, when spectrum is calculated for every step. If resolution is greater than this value, the spectrum will be repeated, so performance requirement will be lower, but spectrum time detail display will be slightly lower. This value is usable in displaying higher spectrum resolutions with fast drawing, when the higher spectrum resolutions than this value will require only slighty higher performance.
 * __Canvas width factor__, __Canvas height factor__ - Lower canvas resolution, this display behavior and performance requirement will be the same, as the screen will be smaller, usable if screen pixels are very small.
 * __Drawing gamma x1000__ - Gamma values used to spectrogram level display, interted value will be divided by 1000.
 * __Pointer strip size__ - Pointer strip width in pixels.
@@ -69,7 +70,8 @@ The available setting parameters are following:
 * __Repaint step__ - Number of audio steps (pixels), which will be repainted by one current audio step. It value must be choosen experimentally, the higher value will result by faster repainting, but requires higher performance.
 * __Repaint margin__ - Number of audio steps (pixels), which will be not repainter directly before indicator, to avoid paint over recently painted spectrum.
 * __Audio buffer size__ - Audio recording buffer size, it must be choosen experimentally.
-* __Stereo mode R__, __Stereo mode G__, __Stereo mode B__ - Selection, wchich audio channels will be assigned to R, G, B color channels.
+* __Audio mode R__, __Audio mode G__, __Audio mode B__ - Selection, wchich audio channels will be assigned to R, G, B color channels.
+* __Audio gain R__, __Audio gain G__, __Audio gain B__ - Color channel value gain, usable to change color tint. This value can not to be confused with spectrum gain.
 * __Audio echo cancellation__ - Echo cancellation using WebAudio parameter (may not work in some web browsers).
 * __Audio noise suppression__ - Noise suppression using WebAudio parameter (may not work in some web browsers).
 * __Audio auto gain control__ - Auto gain control using WebAudio parameter (may not work in some web browsers).

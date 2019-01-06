@@ -1,22 +1,83 @@
-﻿var CanvasObject;
-var CanvasContext;
-var CanvasData;
-var CanvasDataR;
-var CanvasDataG;
-var CanvasDataB;
-var CanvasX = 0;
-var CanvasY = 0;
-var CanvasW = 1;
-var CanvasH = 1;
-var CanvasWX = 1;
-var CanvasLine = 1;
-var CanvasLineNum = 0;
-var CurrentSamplerate = 0;
-var CallbackLag = 0;
-var CanvasRawW = 1;
-var CanvasRawH = 1;
+﻿
 
-var Working = true;
+
+var SET_CanvasScaleH = 1;
+if (DataExists("SET_CanvasScaleH")) { SET_CanvasScaleH = parseInt(DataGet("SET_CanvasScaleH")); }
+
+var SET_CanvasScaleV = 1;
+if (DataExists("SET_CanvasScaleV")) { SET_CanvasScaleV = parseInt(DataGet("SET_CanvasScaleV")); }
+
+var SET_MinimumStep = 6;
+if (DataExists("SET_MinimumStep")) { SET_MinimumStep = parseInt(DataGet("SET_MinimumStep")); }
+
+var SET_MaximumResolution = 10;
+if (DataExists("SET_MaximumResolution")) { SET_MaximumResolution = parseInt(DataGet("SET_MaximumResolution")); }
+
+var SET_DrawGamma = 2200;
+if (DataExists("SET_DrawGamma")) { SET_DrawGamma = parseInt(DataGet("SET_DrawGamma")); }
+
+var SET_ToolbarSize = 50;
+if (DataExists("SET_ToolbarSize")) { SET_ToolbarSize = parseInt(DataGet("SET_ToolbarSize")); }
+
+var SET_ToolbarPosition = 0;
+if (DataExists("SET_ToolbarPosition")) { SET_ToolbarPosition = parseInt(DataGet("SET_ToolbarPosition")); }
+
+var SET_DrawStripSize = 8;
+if (DataExists("SET_DrawStripSize")) { SET_DrawStripSize = parseInt(DataGet("SET_DrawStripSize")); }
+
+var SET_DrawStripColorR = 255;
+if (DataExists("SET_DrawStripColorR")) { SET_DrawStripColorR = parseInt(DataGet("SET_DrawStripColorR")); }
+
+var SET_DrawStripColorG = 255;
+if (DataExists("SET_DrawStripColorG")) { SET_DrawStripColorG = parseInt(DataGet("SET_DrawStripColorG")); }
+
+var SET_DrawStripColorB = 255;
+if (DataExists("SET_DrawStripColorB")) { SET_DrawStripColorB = parseInt(DataGet("SET_DrawStripColorB")); }
+
+var SET_DrawOverdriveThreshold = 30000;
+if (DataExists("SET_DrawOverdriveThreshold")) { SET_DrawOverdriveThreshold = parseInt(DataGet("SET_DrawOverdriveThreshold")); }
+
+var SET_DrawOverdriveColorA = 128;
+if (DataExists("SET_DrawOverdriveColorA")) { SET_DrawOverdriveColorA = parseInt(DataGet("SET_DrawOverdriveColorA")); }
+
+var SET_DrawOverdriveColorR = 255;
+if (DataExists("SET_DrawOverdriveColorR")) { SET_DrawOverdriveColorR = parseInt(DataGet("SET_DrawOverdriveColorR")); }
+
+var SET_DrawOverdriveColorG = 255;
+if (DataExists("SET_DrawOverdriveColorG")) { SET_DrawOverdriveColorG = parseInt(DataGet("SET_DrawOverdriveColorG")); }
+
+var SET_DrawOverdriveColorB = 255;
+if (DataExists("SET_DrawOverdriveColorB")) { SET_DrawOverdriveColorB = parseInt(DataGet("SET_DrawOverdriveColorB")); }
+
+var SET_SampleDecimation = 4;
+if (DataExists("SET_SampleDecimation")) { SET_SampleDecimation = parseInt(DataGet("SET_SampleDecimation")); }
+
+var SET_ButtonFontSize = 8;
+if (DataExists("SET_ButtonFontSize")) { SET_ButtonFontSize = parseInt(DataGet("SET_ButtonFontSize")); }
+
+var SET_DrawOrientation = 0;
+if (DataExists("SET_DrawOrientation")) { SET_DrawOrientation = parseInt(DataGet("SET_DrawOrientation")); }
+
+var SET_FlipBand = false;
+if (DataExists("SET_FlipBand")) { SET_FlipBand = parseInt(DataGet("SET_FlipBand")) == 1; }
+
+var SET_AudioModeR = 0;
+if (DataExists("SET_AudioModeR")) { SET_AudioModeR = parseInt(DataGet("SET_AudioModeR")); }
+
+var SET_AudioGainR = 1000;
+if (DataExists("SET_AudioGainR")) { SET_AudioGainR = parseInt(DataGet("SET_AudioGainR")); }
+
+var SET_AudioModeG = 0;
+if (DataExists("SET_AudioModeG")) { SET_AudioModeG = parseInt(DataGet("SET_AudioModeG")); }
+
+var SET_AudioGainG = 1000;
+if (DataExists("SET_AudioGainG")) { SET_AudioGainG = parseInt(DataGet("SET_AudioGainG")); }
+
+var SET_AudioModeB = 0;
+if (DataExists("SET_AudioModeB")) { SET_AudioModeB = parseInt(DataGet("SET_AudioModeB")); }
+
+var SET_AudioGainB = 1000;
+if (DataExists("SET_AudioGainB")) { SET_AudioGainB = parseInt(DataGet("SET_AudioGainB")); }
 
 var SET_AudioBufferLength = 12;
 if (DataExists("SET_AudioBufferLength")) { SET_AudioBufferLength = parseInt(DataGet("SET_AudioBufferLength")); }
@@ -56,6 +117,39 @@ if (DataExists("SET_AutoStart")) { SET_AutoStart = parseInt(DataGet("SET_AutoSta
 
 var SET_AutoFullscreen = 0;
 if (DataExists("SET_AutoFullscreen")) { SET_AutoFullscreen = parseInt(DataGet("SET_AutoFullscreen")); }
+
+
+var AudioGainR;
+var AudioGainG;
+var AudioGainB;
+
+
+var SET_DrawOverdriveColorX = 255 - SET_DrawOverdriveColorA;
+
+
+var CanvasObject;
+var CanvasContext;
+var CanvasData;
+var CanvasDataR;
+var CanvasDataG;
+var CanvasDataB;
+var CanvasX = 0;
+var CanvasY = 0;
+var CanvasW = 1;
+var CanvasH = 1;
+var CanvasWX = 1;
+var CanvasLine = 1;
+var CanvasLineNum = 0;
+var CurrentSamplerate = 0;
+var CallbackLag = 0;
+var CanvasRawW = 1;
+var CanvasRawH = 1;
+
+var Working = true;
+
+
+
+
 
 var BeforeFirst = false;
 if ((SET_AutoStart == 2) || (SET_AutoFullscreen == 2))
@@ -201,48 +295,9 @@ var DrawPaletteG = [];
 var DrawPaletteB = [];
 
 
-var SET_CanvasScaleH = 1;
-var SET_CanvasScaleV = 1;
-var SET_MinimumStep = 6;
-var SET_DrawGamma = 2200;
-var SET_ToolbarSize = 50;
-var SET_ToolbarPosition = 0;
-// 0 - None
-// 1,5 - Top
-// 2,6 - Bottom
-// 3,7 - Right
-// 4,8 - Left
-var SET_DrawStripSize = 8;
-var SET_DrawStripColorR = 255;
-var SET_DrawStripColorG = 255;
-var SET_DrawStripColorB = 255;
-
-var SET_DrawOverdriveThreshold = 30000;
-var SET_DrawOverdriveColorA = 128;
-var SET_DrawOverdriveColorX = 127;
-var SET_DrawOverdriveColorR = 255;
-var SET_DrawOverdriveColorG = 255;
-var SET_DrawOverdriveColorB = 255;
-
-var SET_SampleDecimation = 4;
-
-var SET_ButtonFontSize = 8;
 
 var CanvasDrawStep = 1;
 var CanvasDrawStepX = 0;
-
-var SET_DrawOrientation = 0;
-
-var SET_FlipBand = false;
-
-var SET_AudioModeR = 0;
-var SET_AudioModeG = 0;
-var SET_AudioModeB = 0;
-// Mix
-// Left
-// Right
-// Difference
-
 
 
 
@@ -738,9 +793,9 @@ function AudioCallback(raw)
             DatumB = 0;
             if ((I_ >= 0) && (I_ < Len))
             {
-                DatumR = Math.floor(DataR[I_]);
-                DatumG = Math.floor(DataG[I_]);
-                DatumB = Math.floor(DataB[I_]);
+                DatumR = Math.round(DataR[I_] * AudioGainR);
+                DatumG = Math.round(DataG[I_] * AudioGainG);
+                DatumB = Math.round(DataB[I_] * AudioGainB);
                 IsOverdrive = IsOverdrive_;
             }
             else
@@ -1454,11 +1509,18 @@ function FFTWindow(X)
 
 function SetFFT()
 {
+    AudioGainR = SET_AudioGainR / 1000.0;
+    AudioGainG = SET_AudioGainG / 1000.0;
+    AudioGainB = SET_AudioGainB / 1000.0;
+
     var Gain_ = Math.pow(2, DISP_Gain);
     var MinMax_ = DISP_MiMa;
     var FFT_ = Math.pow(2, DISP_Reso + 6);
     var Win_ = FFTWindow(DISP_Wind);
-    var Step_ = Math.pow(2, Math.max(DISP_Step, SET_MinimumStep));
+
+    var RealMinimumStep = Math.max(3, SET_MinimumStep - SET_MaximumResolution + DISP_Reso + 5);
+
+    var Step_ = Math.pow(2, Math.max(DISP_Step, RealMinimumStep));
     var Base_ = DISP_Base;
     var CanvasDrawStepX_ = CanvasDrawStepX;
 
@@ -1468,15 +1530,15 @@ function SetFFT()
     if ((SET_AudioModeR == 2) || (SET_AudioModeG == 2) || (SET_AudioModeB == 2)) { AudioModeVal = AudioModeVal + 4; }
     if ((SET_AudioModeR == 3) || (SET_AudioModeG == 3) || (SET_AudioModeB == 3)) { AudioModeVal = AudioModeVal + 8; }
 
-    if (DISP_Step >= SET_MinimumStep)
+    if (DISP_Step >= RealMinimumStep)
     {
         CanvasDrawStep = 1;
         CanvasDrawStepX = 0;
     }
     else
     {
-        CanvasDrawStep = Math.pow(2, SET_MinimumStep - DISP_Step);
-        CanvasDrawStepX = SET_MinimumStep - DISP_Step;
+        CanvasDrawStep = Math.pow(2, RealMinimumStep - DISP_Step);
+        CanvasDrawStepX = RealMinimumStep - DISP_Step;
     }
     
     if (CanvasDrawStepX_ < CanvasDrawStepX)
@@ -1687,31 +1749,6 @@ if (DataExists("DISP_Line")) { DISP_Line = parseInt(DataGet("DISP_Line")); }
 if (DataExists("DISP_Mode")) { DISP_Mode = parseInt(DataGet("DISP_Mode")); }
 if (DataExists("DISP_VU__")) { DISP_VU__ = parseInt(DataGet("DISP_VU__")); }
 
-if (DataExists("SET_CanvasScaleH")) { SET_CanvasScaleH = parseInt(DataGet("SET_CanvasScaleH")); }
-if (DataExists("SET_CanvasScaleV")) { SET_CanvasScaleV = parseInt(DataGet("SET_CanvasScaleV")); }
-if (DataExists("SET_DrawGamma")) { SET_DrawGamma = parseInt(DataGet("SET_DrawGamma")); }
-if (DataExists("SET_ToolbarSize")) { SET_ToolbarSize = parseInt(DataGet("SET_ToolbarSize")); }
-if (DataExists("SET_ToolbarPosition")) { SET_ToolbarPosition = parseInt(DataGet("SET_ToolbarPosition")); }
-if (DataExists("SET_MinimumStep")) { SET_MinimumStep = parseInt(DataGet("SET_MinimumStep")); }
-if (DataExists("SET_DrawStripSize")) { SET_DrawStripSize = parseInt(DataGet("SET_DrawStripSize")); }
-if (DataExists("SET_DrawStripColorR")) { SET_DrawStripColorR = parseInt(DataGet("SET_DrawStripColorR")); }
-if (DataExists("SET_DrawStripColorG")) { SET_DrawStripColorG = parseInt(DataGet("SET_DrawStripColorG")); }
-if (DataExists("SET_DrawStripColorB")) { SET_DrawStripColorB = parseInt(DataGet("SET_DrawStripColorB")); }
-if (DataExists("SET_DrawOverdriveThreshold")) { SET_DrawOverdriveThreshold = parseInt(DataGet("SET_DrawOverdriveThreshold")); }
-if (DataExists("SET_DrawOverdriveColorR")) { SET_DrawOverdriveColorR = parseInt(DataGet("SET_DrawOverdriveColorR")); }
-if (DataExists("SET_DrawOverdriveColorG")) { SET_DrawOverdriveColorG = parseInt(DataGet("SET_DrawOverdriveColorG")); }
-if (DataExists("SET_DrawOverdriveColorB")) { SET_DrawOverdriveColorB = parseInt(DataGet("SET_DrawOverdriveColorB")); }
-if (DataExists("SET_DrawOverdriveColorA")) { SET_DrawOverdriveColorA = parseInt(DataGet("SET_DrawOverdriveColorA")); }
-if (DataExists("SET_SampleDecimation")) { SET_SampleDecimation = parseInt(DataGet("SET_SampleDecimation")); }
-
-if (DataExists("SET_ButtonFontSize")) { SET_ButtonFontSize = parseInt(DataGet("SET_ButtonFontSize")); }
-if (DataExists("SET_DrawOrientation")) { SET_DrawOrientation = parseInt(DataGet("SET_DrawOrientation")); }
-if (DataExists("SET_FlipBand")) { SET_FlipBand = parseInt(DataGet("SET_FlipBand")) == 1; }
-
-if (DataExists("SET_AudioModeR")) { SET_AudioModeR = parseInt(DataGet("SET_AudioModeR")); }
-if (DataExists("SET_AudioModeG")) { SET_AudioModeG = parseInt(DataGet("SET_AudioModeG")); }
-if (DataExists("SET_AudioModeB")) { SET_AudioModeB = parseInt(DataGet("SET_AudioModeB")); }
-
 SET_DrawOverdriveColorX = 255 - SET_DrawOverdriveColorA;
 
 function DispLayout()
@@ -1733,6 +1770,7 @@ function SettingsShow()
     document.getElementById("xSET_ToolbarPosition").selectedIndex = SET_ToolbarPosition;
     document.getElementById("xSET_ToolbarSize").value = SET_ToolbarSize;
     document.getElementById("xSET_MinimumStep").selectedIndex = SET_MinimumStep - 3;
+    document.getElementById("xSET_MaximumResolution").selectedIndex = SET_MaximumResolution - 5;
     document.getElementById("xSET_CanvasScaleH").value = SET_CanvasScaleH;
     document.getElementById("xSET_CanvasScaleV").value = SET_CanvasScaleV;
     document.getElementById("xSET_DrawGamma").value = SET_DrawGamma;
@@ -1767,8 +1805,11 @@ function SettingsShow()
 
     document.getElementById("xSET_AudioBufferLength").selectedIndex = SET_AudioBufferLength - 8;
     document.getElementById("xSET_AudioModeR").selectedIndex = SET_AudioModeR;
+    document.getElementById("xSET_AudioGainR").value = SET_AudioGainR;
     document.getElementById("xSET_AudioModeG").selectedIndex = SET_AudioModeG;
+    document.getElementById("xSET_AudioGainG").value = SET_AudioGainG;
     document.getElementById("xSET_AudioModeB").selectedIndex = SET_AudioModeB;
+    document.getElementById("xSET_AudioGainB").value = SET_AudioGainB;
 
     document.getElementById("Settings").style.display = "block";
 }
@@ -1813,9 +1854,13 @@ function SettingBtn(Cmd)
         case 4:
             SET_SampleDecimation = Limit(document.getElementById("xSET_SampleDecimation").value, 1, 1000);
             SET_MinimumStep = document.getElementById("xSET_MinimumStep").selectedIndex + 3;
+            SET_MaximumResolution = document.getElementById("xSET_MaximumResolution").selectedIndex + 5;
             SET_AudioModeR = document.getElementById("xSET_AudioModeR").selectedIndex;
+            SET_AudioGainR = Limit(document.getElementById("xSET_AudioGainR").value, 0, 1000);
             SET_AudioModeG = document.getElementById("xSET_AudioModeG").selectedIndex;
+            SET_AudioGainG = Limit(document.getElementById("xSET_AudioGainG").value, 0, 1000);
             SET_AudioModeB = document.getElementById("xSET_AudioModeB").selectedIndex;
+            SET_AudioGainB = Limit(document.getElementById("xSET_AudioGainB").value, 0, 1000);
             SET_BufLength = Limit(document.getElementById("xSET_BufLength").value, 0, 1000000000);
             SET_BufTick = Limit(document.getElementById("xSET_BufTick").value, 0, 1000);
             SET_BufTickMargin = Limit(document.getElementById("xSET_BufTickMargin").value, 0, 1000);
@@ -1824,9 +1869,13 @@ function SettingBtn(Cmd)
 
             DataSet("SET_SampleDecimation", SET_SampleDecimation);
             DataSet("SET_MinimumStep", SET_MinimumStep);
+            DataSet("SET_MaximumResolution", SET_MaximumResolution);
             DataSet("SET_AudioModeR", SET_AudioModeR);
+            DataSet("SET_AudioGainR", SET_AudioGainR);
             DataSet("SET_AudioModeG", SET_AudioModeG);
+            DataSet("SET_AudioGainG", SET_AudioGainG);
             DataSet("SET_AudioModeB", SET_AudioModeB);
+            DataSet("SET_AudioGainB", SET_AudioGainB);
             DataSet("SET_BufLength", SET_BufLength);
             DataSet("SET_BufTick", SET_BufTick);
             DataSet("SET_BufTickMargin", SET_BufTickMargin);
@@ -1840,6 +1889,10 @@ function SettingBtn(Cmd)
 
             document.getElementById("xCurrentSamplerate").innerHTML = CurrentSamplerate;
             document.getElementById("xCurrentSamplerateX").innerHTML = CurrentSamplerate / SET_SampleDecimation;
+
+            document.getElementById("xSET_AudioGainR").value = SET_AudioGainR;
+            document.getElementById("xSET_AudioGainG").value = SET_AudioGainG;
+            document.getElementById("xSET_AudioGainB").value = SET_AudioGainB;
 
             SetFFT();
             break;
