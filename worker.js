@@ -212,6 +212,10 @@
     var FFT_FFT_Mode = 0;
 
     var FFT_Dummy;
+    var FFT_CalcReal;
+    var FFT_CalcImag;
+    var FFT_Raw0;
+    var FFT_RawX;
 
     function FFT_FFT(raw, rawoffset, SampleValue, PerformOp)
     {
@@ -299,16 +303,8 @@
         return raw0;
     }
 
-    function FFT_FFT2(raw, rawoffset, SampleValue)
-    {
-        var raw0 = new Float32Array(FFT_FourierBase);
-        return raw0;
-    }
-
     function FFT_FFT0(raw, rawoffset, SampleValue)
     {
-        var real = new Float32Array(FFT_FourierBase);
-        var imag = new Float32Array(FFT_FourierBase);
         var raw0 = new Float32Array(FFT_FourierBase);
 
         var I;
@@ -324,15 +320,15 @@
             {
                 SampleValue[1] = T;
             }
-            real[I] = (T * FFT_FourierWindowVals[I]);
-            imag[I] = 0;
+            FFT_CalcReal[I] = (T * FFT_FourierWindowVals[I]);
+            FFT_CalcImag[I] = 0;
         }
-        FFT_transform_radix2(real, imag, FFT_FourierBase);
+        FFT_transform_radix2(FFT_CalcReal, FFT_CalcImag, FFT_FourierBase);
         for (I = 0; I < FFT_FourierBase; I++)
         {
-            real[I] = real[I] / FFT_FourierBase;
-            imag[I] = imag[I] / FFT_FourierBase;
-            T = Math.sqrt((real[I] * real[I]) + (imag[I] * imag[I])) * SpectrumGain;
+            FFT_CalcReal[I] = FFT_CalcReal[I] / FFT_FourierBase;
+            FFT_CalcImag[I] = FFT_CalcImag[I] / FFT_FourierBase;
+            T = Math.sqrt((FFT_CalcReal[I] * FFT_CalcReal[I]) + (FFT_CalcImag[I] * FFT_CalcImag[I])) * SpectrumGain;
             T = T + SpectrumBase;
             if (T > 70000)
             {
@@ -348,10 +344,9 @@
             raw0[I] = T;
         }
 
-        var rawX;
         if (SpectrumMinMax != 0)
         {
-            var rawX = new Float32Array(FFT_FourierBase);
+            var rawX = FFT_RawX;
             var S = (FFT_FourierBase >> 1) - 1;
 
             var I_, I0, II_, II0;
@@ -405,10 +400,10 @@
                     }
                 }
             }
-        }
-        else
-        {
-            rawX = raw0;
+            for (I_ = S; I_ > 0; I_--)
+            {
+                raw0[I_] = rawX[I_];
+            }
         }
         if (FFT_Decimation > 1)
         {
@@ -417,23 +412,28 @@
             T = 0;
             for (I = (FFT_FourierBase - 1); I >= 0; I--)
             {
-                T = T + rawX[I];
+                T = T + raw0[I];
                 I_--;
                 if (I_ == 0)
                 {
                     I_ = FFT_Decimation;
-                    rawX[I] = T / FFT_Decimation;
+                    raw0[I] = T / FFT_Decimation;
                     T = 0;
                 }
             }
         }
-        return rawX;
+        return raw0;
     }
 
 
     function FFT_Init()
     {
         FFT_Dummy = new Float32Array(FFT_FourierBase);
+        FFT_CalcReal = new Float32Array(FFT_FourierBase);
+        FFT_CalcImag = new Float32Array(FFT_FourierBase);
+        FFT_Raw0 = new Float32Array(FFT_FourierBase);
+        FFT_RawX = new Float32Array(FFT_FourierBase);
+
         for (I = 0; I < FFT_FourierBase; I++)
         {
             FFT_Dummy[I] = 0;
