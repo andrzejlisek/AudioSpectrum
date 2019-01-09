@@ -13,6 +13,9 @@ if (DataExists("SET_MinimumStep")) { SET_MinimumStep = parseInt(DataGet("SET_Min
 var SET_MaximumResolution = 10;
 if (DataExists("SET_MaximumResolution")) { SET_MaximumResolution = parseInt(DataGet("SET_MaximumResolution")); }
 
+var SET_FFTWindow = 3;
+if (DataExists("SET_FFTWindow")) { SET_FFTWindow = parseInt(DataGet("SET_FFTWindow")); }
+
 var SET_DrawGamma = 2200;
 if (DataExists("SET_DrawGamma")) { SET_DrawGamma = parseInt(DataGet("SET_DrawGamma")); }
 
@@ -1562,7 +1565,7 @@ function SetFFT()
     {
         FFTDecimation = 1 << FFTDecimationX;
     }
-    audioRecorder.Msg({ command: 'fft', DispMode: DISP_VU__, FFT: FFT_, Win: Win_, FFTDecimation: FFTDecimation, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: AudioModeVal, DispSize: (DISP_Line * CanvasWX) - SET_BufTickMargin, BufTick: SET_BufTick, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
+    audioRecorder.Msg({ command: 'fft', DispMode: DISP_VU__, FFT: FFT_, Win: Win_, FFTWin: SET_FFTWindow, FFTDecimation: FFTDecimation, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: AudioModeVal, DispSize: (DISP_Line * CanvasWX) - SET_BufTickMargin, BufTick: SET_BufTick, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
 }
 
 function BtnAction(Btn)
@@ -1771,6 +1774,7 @@ function SettingsShow()
     document.getElementById("xSET_ToolbarSize").value = SET_ToolbarSize;
     document.getElementById("xSET_MinimumStep").selectedIndex = SET_MinimumStep - 3;
     document.getElementById("xSET_MaximumResolution").selectedIndex = SET_MaximumResolution - 5;
+    document.getElementById("xSET_FFTWindow").selectedIndex = SET_FFTWindow;
     document.getElementById("xSET_CanvasScaleH").value = SET_CanvasScaleH;
     document.getElementById("xSET_CanvasScaleV").value = SET_CanvasScaleV;
     document.getElementById("xSET_DrawGamma").value = SET_DrawGamma;
@@ -1855,6 +1859,7 @@ function SettingBtn(Cmd)
             SET_SampleDecimation = Limit(document.getElementById("xSET_SampleDecimation").value, 1, 1000);
             SET_MinimumStep = document.getElementById("xSET_MinimumStep").selectedIndex + 3;
             SET_MaximumResolution = document.getElementById("xSET_MaximumResolution").selectedIndex + 5;
+            SET_FFTWindow = document.getElementById("xSET_FFTWindow").selectedIndex;
             SET_AudioModeR = document.getElementById("xSET_AudioModeR").selectedIndex;
             SET_AudioGainR = Limit(document.getElementById("xSET_AudioGainR").value, 0, 1000);
             SET_AudioModeG = document.getElementById("xSET_AudioModeG").selectedIndex;
@@ -1870,6 +1875,7 @@ function SettingBtn(Cmd)
             DataSet("SET_SampleDecimation", SET_SampleDecimation);
             DataSet("SET_MinimumStep", SET_MinimumStep);
             DataSet("SET_MaximumResolution", SET_MaximumResolution);
+            DataSet("SET_FFTWindow", SET_FFTWindow);
             DataSet("SET_AudioModeR", SET_AudioModeR);
             DataSet("SET_AudioGainR", SET_AudioGainR);
             DataSet("SET_AudioModeG", SET_AudioModeG);

@@ -84,10 +84,11 @@
                 if (AudioModeTemp >= 4) { AudioModeL = true; AudioModeTemp = AudioModeTemp - 4; }
                 if (AudioModeTemp >= 2) { AudioModeS = true; AudioModeTemp = AudioModeTemp - 2; }
                 if (AudioModeTemp >= 1) { AudioModeM = true; AudioModeTemp = AudioModeTemp - 1; }
-                if ((FFT_FourierBase != e.data.FFT) || (FFT_WinFactor != e.data.Win))
+                if ((FFT_FourierBase != e.data.FFT) || (FFT_WinFactor != e.data.Win) || (FFT_FourierWindow != e.data.FFTWin))
                 {
                     FFT_FourierBase = e.data.FFT;
                     FFT_WinFactor = e.data.Win;
+                    FFT_FourierWindow = e.data.FFTWin;
                     FFT_Init();
                 }
                 FFT_Decimation = e.data.FFTDecimation;

@@ -115,6 +115,18 @@
                     </td>
                 </tr>
                 <tr>
+                    <td><label for="xSET_FFTWindow">Spectrum window type:</label></td>
+                    <td>
+                        <select id="xSET_FFTWindow" onchange="SettingBtn(4);">
+                            <option value="0">Rectangle</option>
+                            <option value="1">Triangle</option>
+                            <option value="2">Hanning</option>
+                            <option value="3">Blackman</option>
+                            <option value="4">Hamming</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
                     <td><label for="xSET_CanvasScaleH">Canvas width factor:</label></td>
                     <td><input type="text" id="xSET_CanvasScaleH" onchange="SettingBtn(3);" size="5"></td>
                 </tr>

@@ -54,6 +54,7 @@ The available setting parameters are following:
 * __Toolbar button size__ - One button size of tool bar. It changes, how big area of screen is occupied by toolbar.
 * __Decimate below step__ - Minimal step value, when spectrum is calculated for every step. If step size is less than this value, the spectrum will be repeated, so performance requirement will be lower, but spectrum time detail display will be slightly lower. This value is usable in displaying lower spectrum steps with fast drawing, when the lower spectrum steps than this value will require only slighty higher performance.
 * __Decimate above resolution__ - Maximum resolution value, when spectrum is calculated for every step. If resolution is greater than this value, the spectrum will be repeated, so performance requirement will be lower, but spectrum time detail display will be slightly lower. This value is usable in displaying higher spectrum resolutions with fast drawing, when the higher spectrum resolutions than this value will require only slighty higher performance.
+* __Spectrum window type__ - Window type used to calculate Fourier transform used in spectrum.
 * __Canvas width factor__, __Canvas height factor__ - Lower canvas resolution, this display behavior and performance requirement will be the same, as the screen will be smaller, usable if screen pixels are very small.
 * __Drawing gamma x1000__ - Gamma values used to spectrogram level display, interted value will be divided by 1000.
 * __Pointer strip size__ - Pointer strip width in pixels.
