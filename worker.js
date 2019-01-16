@@ -21,7 +21,7 @@
     var AudioModeL = false;
     var AudioModeR = false;
 
-    var sampleRate;
+    var SampleRate;
     var SampleDecimation = 1;
     var SampleDecimationBufM = 0;
     var SampleDecimationBufS = 0;
@@ -52,6 +52,7 @@
     var BufCounter = 0;
     var BufPerTick = 50;
     var BufOffset = 0;
+    var BufPerTick0 = 0;
 
     var WaveformBack = 32;
     var WaveformFore = 256;
@@ -72,6 +73,9 @@
                 break;
             case 'pause':
                 IsPaused = e.data.Pause;
+                break;
+            case 'free':
+                SpectrumBufFreeX(e.data.N);
                 break;
             case 'fft':
                 SampleDecimation = e.data.Decimation;
@@ -129,6 +133,61 @@
 
     var FFT_Fourier_levels = 0;
     var M_PI = 3.14159265358979323846;
+
+    var SpectrumBufMemData = new Array();
+    var SpectrumBufMemFree = new Array();
+    var SpectrumBufMemCnt = 0;
+
+    function SpectrumBufClear()
+    {
+        SpectrumBufMemData = new Array();
+        SpectrumBufMemFree = new Array();
+        SpectrumBufMemCnt = 0;
+    }
+
+    function SpectrumBufAlloc()
+    {
+        var II = -1;
+        for (var I = 0; I < SpectrumBufMemCnt; I++)
+        {
+            if (SpectrumBufMemFree[I])
+            {
+                II = I;
+                I = SpectrumBufMemCnt;
+            }
+        }
+        if (II >= 0)
+        {
+            SpectrumBufMemFree[II] = false;
+        }
+        else
+        {
+            II = SpectrumBufMemCnt;
+            var RawItem = new Float32Array(FFT_FourierBase + 1);
+            RawItem[FFT_FourierBase] = II;
+            SpectrumBufMemData.push(RawItem);
+            SpectrumBufMemFree.push(false);
+            SpectrumBufMemCnt++;
+        }
+        return(SpectrumBufMemData[II]);
+    }
+
+    function SpectrumBufFreeX(N)
+    {
+        var L = N[0];
+        for (var I = 1; I < L; I++)
+        {
+            SpectrumBufMemFree[N[I]] = true;
+        }
+    }
+
+    function SpectrumBufFree(II)
+    {
+        if ((II >= 0) && (II < SpectrumBufMemCnt))
+        {
+            SpectrumBufMemFree[II] = true;
+        }
+    }
 
     function FFT_transform_radix2_init(n)
     {
@@ -271,7 +330,7 @@
             }
         }
 
-        var raw0 = new Float32Array(FFT_FourierBase);
+        var raw0 = SpectrumBufAlloc();
 
         ValMin = (ValMin * FFT_FourierBase) / 131072.0;
         ValMax = (ValMax * FFT_FourierBase) / 131072.0;
@@ -306,7 +365,7 @@
 
     function FFT_FFT0(raw, rawoffset, SampleValue)
     {
-        var raw0 = new Float32Array(FFT_FourierBase);
+        var raw0 = SpectrumBufAlloc();
 
         var I;
         var T;
@@ -429,7 +488,8 @@
 
     function FFT_Init()
     {
-        FFT_Dummy = new Float32Array(FFT_FourierBase);
+        SpectrumBufClear();
+        FFT_Dummy = new Float32Array(FFT_FourierBase + 1);
         FFT_CalcReal = new Float32Array(FFT_FourierBase);
         FFT_CalcImag = new Float32Array(FFT_FourierBase);
         FFT_Raw0 = new Float32Array(FFT_FourierBase);
@@ -439,6 +499,7 @@
         {
             FFT_Dummy[I] = 0;
         }
+        FFT_Dummy[FFT_FourierBase] = -1;
 
         FFT_transform_radix2_init(FFT_FourierBase);
         var FourierBaseX = FFT_FourierBase / 2;
@@ -509,7 +570,7 @@
 
     function init(config)
     {
-        sampleRate = config.sampleRate;
+        SampleRate = config.sampleRate;
         BufLength = config.bufLen;
 
         FFT_cos_table = new Float32Array(4000000);
@@ -548,6 +609,7 @@
             BufPointer0 = BufPointer;
             BufOffset = 0;
             BufDisp0 = BufDisp;
+            BufPerTick0 = BufPerTick;
             FFTOffsetBuf = BufPointer - FFTSize - (SpectrumStepCounter % SpectrumStep);
             if (FFTOffsetBuf < 0)
             {
@@ -570,7 +632,11 @@
                 }
             }
 
-            for (var ii = 0; ii < BufPerTick; ii++)
+            if (BufPerTick0 > BufDisp0)
+            {
+                BufPerTick0 = BufDisp0;
+            }
+            for (var ii = 0; ii < BufPerTick0; ii++)
             {
                 BufEntries++;
                 SampleValue[0] = 0;
@@ -593,16 +659,17 @@
                 }
                 else
                 {
-                    ii = BufPerTick;
+                    ii = BufPerTick0;
                     BufCounter = 0;
                 }
             }
-            FFTOffsetBuf -= (BufPerTick * SpectrumStep);
+            BufDisp0 -= BufPerTick0;
+            FFTOffsetBuf -= (BufPerTick0 * SpectrumStep);
             while (FFTOffsetBuf < 0)
             {
                 FFTOffsetBuf = FFTOffsetBuf + BufLength;
             }
-            if (BufCounter >= BufDisp0)
+            if (BufDisp0 <= 0)
             {
                 BufCounter = 0;
             }
@@ -671,7 +738,10 @@
         if (BufEntries > 0)
         {
             BufOffset += (BufEntries - BufEntriesX);
-            BufDisp0 -= (BufEntries - BufEntriesX);
+            if (BufDisp0 > 0)
+            {
+                BufDisp0 -= (BufEntries - BufEntriesX);
+            }
             buffers[1] = BufEntries;
             buffers[2] = performance.now();
             this.postMessage(buffers);

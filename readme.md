@@ -69,7 +69,6 @@ The available setting parameters are following:
 * __Button font size__ - Button font size, it can affect button size.
 * __Repaint length__ - Number of samples, which can be repainted backward in every action, which affects spectrogram/waveform display. This value affects the range of repainting backward.
 * __Repaint step__ - Number of audio steps (pixels), which will be repainted by one current audio step. It value must be choosen experimentally, the higher value will result by faster repainting, but requires higher performance.
-* __Repaint margin__ - Number of audio steps (pixels), which will be not repainter directly before indicator, to avoid paint over recently painted spectrum.
 * __Audio buffer size__ - Audio recording buffer size, it must be choosen experimentally.
 * __Audio mode R__, __Audio mode G__, __Audio mode B__ - Selection, wchich audio channels will be assigned to R, G, B color channels.
 * __Audio gain R__, __Audio gain G__, __Audio gain B__ - Color channel value gain, usable to change color tint. This value can not to be confused with spectrum gain.

@@ -1,7 +1,4 @@
-﻿
-
-
-var SET_CanvasScaleH = 1;
+﻿var SET_CanvasScaleH = 1;
 if (DataExists("SET_CanvasScaleH")) { SET_CanvasScaleH = parseInt(DataGet("SET_CanvasScaleH")); }
 
 var SET_CanvasScaleV = 1;
@@ -10,7 +7,7 @@ if (DataExists("SET_CanvasScaleV")) { SET_CanvasScaleV = parseInt(DataGet("SET_C
 var SET_MinimumStep = 6;
 if (DataExists("SET_MinimumStep")) { SET_MinimumStep = parseInt(DataGet("SET_MinimumStep")); }
 
-var SET_MaximumResolution = 10;
+var SET_MaximumResolution = 9;
 if (DataExists("SET_MaximumResolution")) { SET_MaximumResolution = parseInt(DataGet("SET_MaximumResolution")); }
 
 var SET_FFTWindow = 3;
@@ -91,9 +88,6 @@ if (DataExists("SET_BufLength")) { SET_BufLength = parseInt(DataGet("SET_BufLeng
 var SET_BufTick = 50;
 if (DataExists("SET_BufTick")) { SET_BufTick = parseInt(DataGet("SET_BufTick")); }
 
-var SET_BufTickMargin = 100;
-if (DataExists("SET_BufTickMargin")) { SET_BufTickMargin = parseInt(DataGet("SET_BufTickMargin")); }
-
 var SET_DispModeLines = 2;
 if (DataExists("SET_DispModeLines")) { SET_DispModeLines = parseInt(DataGet("SET_DispModeLines")); }
 
@@ -150,7 +144,7 @@ var CanvasRawH = 1;
 
 var Working = true;
 
-
+var MemFreeIndex = new Array();
 
 
 
@@ -228,6 +222,11 @@ var MonoAudio = false;
         this.pause = function(Pause_)
         {
             worker.postMessage({ command: 'pause', Pause: Pause_ });
+        }
+
+        this.datafree = function()
+        {
+            worker.postMessage({ command: 'free', N: MemFreeIndex });
         }
 
         this.clear = function()
@@ -714,6 +713,7 @@ function AudioCallback(raw)
     var DataG;
     var DataB;
     var Len;
+    var Len_;
     var LenO;
     var Zoom1;
     var Zoom2;
@@ -723,6 +723,8 @@ function AudioCallback(raw)
     var DatumR;
     var DatumG;
     var DatumB;
+
+    var MemFreeIdx = 1;
 
     for (var ii = 0; ii < datacount; ii++)
     {
@@ -750,7 +752,7 @@ function AudioCallback(raw)
             CanvasHalfY = CanvasLine;
             if (DrawPointerX < 0)
             {
-                DrawPointerX = DrawPointerX + CanvasWX;
+                DrawPointerX = DrawPointerX + CanvasWX + 1;
                 if (((CanvasLineY0 + CanvasHalfY) >= 0) && (CanvasLineY0 > 0))
                 {
                     CanvasHalfY = 0 - CanvasLine;
@@ -765,7 +767,8 @@ function AudioCallback(raw)
         DataR = raw[ii * 7 + 3 + SET_AudioModeR];
         DataG = raw[ii * 7 + 3 + SET_AudioModeG];
         DataB = raw[ii * 7 + 3 + SET_AudioModeB];
-        Len = Math.floor(DataR.length / 2);
+        Len_ = DataR.length - 1;
+        Len = Math.floor(Len_ / 2);
 
 
         Zoom1 = Math.floor(Zoom_ / Len);
@@ -825,6 +828,25 @@ function AudioCallback(raw)
             }
         }
 
+        DatumR = DataR[Len_];
+        DatumG = DataG[Len_];
+        DatumB = DataB[Len_];
+        if (DatumR >= 0)
+        {
+            MemFreeIndex[MemFreeIdx] = DatumR;
+            MemFreeIdx++
+        }
+        if ((DatumG >= 0) && (DatumR != DatumG))
+        {
+            MemFreeIndex[MemFreeIdx] = DatumG;
+            MemFreeIdx++
+        }
+        if ((DatumB >= 0) && ((DatumR != DatumB) || (DatumG != DatumB)))
+        {
+            MemFreeIndex[MemFreeIdx] = DatumB;
+            MemFreeIdx++
+        }
+
         if (Position == 0)
         {
             DrawPointer++;
@@ -846,7 +868,7 @@ function AudioCallback(raw)
                 CanvasHalfY = CanvasLine;
                 if (DrawPointerX < 0)
                 {
-                    DrawPointerX = DrawPointerX + CanvasWX;
+                    DrawPointerX = DrawPointerX + CanvasWX + 1;
                     if (CanvasLineNum > 0)
                     {
                         CanvasHalfY = 0 - CanvasLine;
@@ -859,7 +881,13 @@ function AudioCallback(raw)
             }
         }
     }
-    if (datacount == 0)
+
+    if (datacount > 0)
+    {
+        MemFreeIndex[0] = MemFreeIdx;
+        audioRecorder.datafree();
+    }
+    else
     {
         if (DISP_Mode == 1)
         {
@@ -867,7 +895,7 @@ function AudioCallback(raw)
             CanvasHalfY = CanvasLine;
             if (DrawPointerX < 0)
             {
-                DrawPointerX = DrawPointerX + CanvasWX;
+                DrawPointerX = DrawPointerX + CanvasWX + 1;
                 if (CanvasLineNum > 0)
                 {
                     CanvasHalfY = 0 - CanvasLine;
@@ -1340,11 +1368,26 @@ var DISP_Reso = 4;
 var DISP_Wind = 40;
 var DISP_Zoom = 0;
 var DISP_Offs = 0;
-var DISP_Step = 7;
+var DISP_Step = 6;
 var DISP_Base = 0;
 var DISP_MiMa = 0;
 var DISP_Line = 1;
 var DISP_Mode = 0;
+var DISP_VU__ = 0;
+
+if (DataExists("DISP_Gain")) { DISP_Gain = parseInt(DataGet("DISP_Gain")); }
+if (DataExists("DISP_Reso")) { DISP_Reso = parseInt(DataGet("DISP_Reso")); }
+if (DataExists("DISP_Wind")) { DISP_Wind = parseInt(DataGet("DISP_Wind")); }
+if (DataExists("DISP_Zoom")) { DISP_Zoom = parseInt(DataGet("DISP_Zoom")); }
+if (DataExists("DISP_Offs")) { DISP_Offs = parseInt(DataGet("DISP_Offs")); }
+if (DataExists("DISP_Step")) { DISP_Step = parseInt(DataGet("DISP_Step")); }
+if (DataExists("DISP_Base")) { DISP_Base = parseInt(DataGet("DISP_Base")); }
+if (DataExists("DISP_MiMa")) { DISP_MiMa = parseInt(DataGet("DISP_MiMa")); }
+if (DataExists("DISP_Line")) { DISP_Line = parseInt(DataGet("DISP_Line")); }
+if (DataExists("DISP_Mode")) { DISP_Mode = parseInt(DataGet("DISP_Mode")); }
+if (DataExists("DISP_VU__")) { DISP_VU__ = parseInt(DataGet("DISP_VU__")); }
+
+
 
 function SetLabels()
 {
@@ -1565,7 +1608,8 @@ function SetFFT()
     {
         FFTDecimation = 1 << FFTDecimationX;
     }
-    audioRecorder.Msg({ command: 'fft', DispMode: DISP_VU__, FFT: FFT_, Win: Win_, FFTWin: SET_FFTWindow, FFTDecimation: FFTDecimation, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: AudioModeVal, DispSize: (DISP_Line * CanvasWX) - SET_BufTickMargin, BufTick: SET_BufTick, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
+
+    audioRecorder.Msg({ command: 'fft', DispMode: DISP_VU__, FFT: FFT_, Win: Win_, FFTWin: SET_FFTWindow, FFTDecimation: FFTDecimation, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: AudioModeVal, DispSize: (DISP_Line * CanvasWX) - Math.ceil(SET_DrawStripSize / CanvasDrawStep) + 1, BufTick: Math.ceil(SET_BufTick / CanvasDrawStep), WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
 }
 
 function BtnAction(Btn)
@@ -1724,34 +1768,6 @@ function BtnAction(Btn)
     SetLabels();
 }
 
-
-
-
-
-var DISP_Gain = 7;
-var DISP_Reso = 4;
-var DISP_Wind = 40;
-var DISP_Zoom = 0;
-var DISP_Offs = 0;
-var DISP_Step = 7;
-var DISP_Base = 0;
-var DISP_MiMa = 0;
-var DISP_Line = 1;
-var DISP_Mode = 0;
-var DISP_VU__ = 0;
-
-if (DataExists("DISP_Gain")) { DISP_Gain = parseInt(DataGet("DISP_Gain")); }
-if (DataExists("DISP_Reso")) { DISP_Reso = parseInt(DataGet("DISP_Reso")); }
-if (DataExists("DISP_Wind")) { DISP_Wind = parseInt(DataGet("DISP_Wind")); }
-if (DataExists("DISP_Zoom")) { DISP_Zoom = parseInt(DataGet("DISP_Zoom")); }
-if (DataExists("DISP_Offs")) { DISP_Offs = parseInt(DataGet("DISP_Offs")); }
-if (DataExists("DISP_Step")) { DISP_Step = parseInt(DataGet("DISP_Step")); }
-if (DataExists("DISP_Base")) { DISP_Base = parseInt(DataGet("DISP_Base")); }
-if (DataExists("DISP_MiMa")) { DISP_MiMa = parseInt(DataGet("DISP_MiMa")); }
-if (DataExists("DISP_Line")) { DISP_Line = parseInt(DataGet("DISP_Line")); }
-if (DataExists("DISP_Mode")) { DISP_Mode = parseInt(DataGet("DISP_Mode")); }
-if (DataExists("DISP_VU__")) { DISP_VU__ = parseInt(DataGet("DISP_VU__")); }
-
 SET_DrawOverdriveColorX = 255 - SET_DrawOverdriveColorA;
 
 function DispLayout()
@@ -1780,7 +1796,6 @@ function SettingsShow()
     document.getElementById("xSET_DrawGamma").value = SET_DrawGamma;
     document.getElementById("xSET_BufLength").value = SET_BufLength;
     document.getElementById("xSET_BufTick").value = SET_BufTick;
-    document.getElementById("xSET_BufTickMargin").value = SET_BufTickMargin;
 
     document.getElementById("xSET_DrawStripSize").value = SET_DrawStripSize;
     document.getElementById("xSET_DrawStripColorR").value = SET_DrawStripColorR;
@@ -1868,7 +1883,6 @@ function SettingBtn(Cmd)
             SET_AudioGainB = Limit(document.getElementById("xSET_AudioGainB").value, 0, 1000);
             SET_BufLength = Limit(document.getElementById("xSET_BufLength").value, 0, 1000000000);
             SET_BufTick = Limit(document.getElementById("xSET_BufTick").value, 0, 1000);
-            SET_BufTickMargin = Limit(document.getElementById("xSET_BufTickMargin").value, 0, 1000);
             SET_WaveformBack = Limit(document.getElementById("xSET_WaveformBack").value, 0, 65536);
             SET_WaveformFore = Limit(document.getElementById("xSET_WaveformFore").value, 0, 65536);
 
@@ -1884,12 +1898,10 @@ function SettingBtn(Cmd)
             DataSet("SET_AudioGainB", SET_AudioGainB);
             DataSet("SET_BufLength", SET_BufLength);
             DataSet("SET_BufTick", SET_BufTick);
-            DataSet("SET_BufTickMargin", SET_BufTickMargin);
 
             document.getElementById("xSET_SampleDecimation").value = SET_SampleDecimation;
             document.getElementById("xSET_BufLength").value = SET_BufLength;
             document.getElementById("xSET_BufTick").value = SET_BufTick;
-            document.getElementById("xSET_BufTickMargin").value = SET_BufTickMargin;
             document.getElementById("xSET_WaveformBack").value = SET_WaveformBack;
             document.getElementById("xSET_WaveformFore").value = SET_WaveformFore;
 
