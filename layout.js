@@ -67,6 +67,9 @@ function SetLayout()
             }
         }
     }
+
+    var LayoutOrder__ = LayoutOrder_;
+
     for (var I = 0; I < LayoutNum; I++)
     {
         if (LayoutOrder_.indexOf(I.toString()[0]) < 0)
@@ -87,11 +90,47 @@ function SetLayout()
     WORK_Spectrum = ((SET_Layout_SpectrogramSizeV > 0) ? true : false);
     WORK_Scope = ((SET_Layout_OscilloscopeSizeV > 0) ? true : false);
 
-    SetLayoutSize("AppSpectrogram", SET_Layout_SpectrogramSizeV, SET_Layout_SpectrogramSizeU);
-    SetLayoutSize("AppOscilloscope", SET_Layout_OscilloscopeSizeV, SET_Layout_OscilloscopeSizeU);
-    SetLayoutSize("AppFilter", SET_Layout_FilterSizeV, SET_Layout_FilterSizeU);
-    SetLayoutSize("AppProcess", SET_Layout_ProcessSizeV, SET_Layout_ProcessSizeU);
-    SetLayoutSize("AppPlaylist", SET_Layout_PlaylistSizeV, SET_Layout_PlaylistSizeU);
+    if (LayoutOrder__.indexOf("0") >= 0)
+    {
+        SetLayoutSize("AppSpectrogram", SET_Layout_SpectrogramSizeV, SET_Layout_SpectrogramSizeU);
+    }
+    else
+    {
+        SetLayoutSize("AppSpectrogram", 0, 0);
+    }
+    if (LayoutOrder__.indexOf("1") >= 0)
+    {
+        SetLayoutSize("AppOscilloscope", SET_Layout_OscilloscopeSizeV, SET_Layout_OscilloscopeSizeU);
+    }
+    else
+    {
+        SetLayoutSize("AppOscilloscope", 0, 0);
+    }
+    if (LayoutOrder__.indexOf("2") >= 0)
+    {
+        SetLayoutSize("AppFilter", SET_Layout_FilterSizeV, SET_Layout_FilterSizeU);
+    }
+    else
+    {
+        SetLayoutSize("AppFilter", 0, 0);
+    }
+    if (LayoutOrder__.indexOf("3") >= 0)
+    {
+        SetLayoutSize("AppProcess", SET_Layout_ProcessSizeV, SET_Layout_ProcessSizeU);
+    }
+    else
+    {
+        SetLayoutSize("AppProcess", 0, 0);
+    }
+    if (LayoutOrder__.indexOf("4") >= 0)
+    {
+        SetLayoutSize("AppPlaylist", SET_Layout_PlaylistSizeV, SET_Layout_PlaylistSizeU);
+    }
+    else
+    {
+        SetLayoutSize("AppPlaylist", 0, 0);
+    }
+
     SpectrogramSetLayout();
     ScopeSetLayout();
     FilterSetLayout();
