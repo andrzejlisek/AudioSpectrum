@@ -1,10 +1,20 @@
-﻿function LS()
+function LS()
 {
     try
     {
         if (localStorage)
         {
-            return true;
+            const test = "test" + new Date().valueOf();
+            try
+            {
+                localStorage.setItem(test, test);
+                localStorage.removeItem(test);
+                return true;
+            }
+            catch(e)
+            {
+                return false;
+            }
         }
         else
         {
@@ -98,14 +108,17 @@ function DataSet(name, val)
 
 function DataDelete(name)
 {
-    if (LS())
+    if (DataExists(name))
     {
-        localStorage.removeItem(name)
-    }
-    else
-    {
-        const cookieName = encodeURIComponent(name);
-        document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+        if (LS())
+        {
+            localStorage.removeItem(name)
+        }
+        else
+        {
+            const cookieName = encodeURIComponent(name);
+            document.cookie = cookieName + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+        }
     }
 }
 
@@ -142,5 +155,61 @@ function DataClear()
             var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
             document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
         }
+    }
+}
+
+function DataSetI(name, val)
+{
+    DataSet(name, val);
+}
+
+function DataGetI(name)
+{
+    return parseInt(DataGet(name));
+}
+
+function DataSetB(name, val)
+{
+    DataSet(name, val ? "1" : "0");
+}
+
+function DataGetB(name)
+{
+    return (DataGet(name) == "1");
+}
+
+function DataGetDefault(name, val)
+{
+    if (DataExists(name))
+    {
+        return DataGet(name);
+    }
+    else
+    {
+        return val;
+    }
+}
+
+function DataGetIDefault(name, val)
+{
+    if (DataExists(name))
+    {
+        return DataGetI(name);
+    }
+    else
+    {
+        return val;
+    }
+}
+
+function DataGetBDefault(name, val)
+{
+    if (DataExists(name))
+    {
+        return DataGetB(name);
+    }
+    else
+    {
+        return val;
     }
 }
