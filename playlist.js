@@ -52,31 +52,24 @@ function PlaylistGetSamples(Len, ChL, ChR)
             {
                 if (PlaylistPointer >= PlaylistLength[PlaylistIndex])
                 {
-                    if (PlaylistIndex < (PlaylistCount - 1))
+                    PlaylistIndex++;
+                    if (PlaylistIndex > (PlaylistCount - 1))
                     {
-                        PlaylistIndex++;
-                    }
-                    else
-                    {
-                        PlaylistTempo = 0;
+                        PlaylistIndex = 0;
                     }
                     PlaylistPointer = 0;
                 }
             }
-            else
+            if (PlaylistTempo < 0)
             {
                 if (PlaylistPointer < 0)
                 {
-                    if (PlaylistIndex > 0)
+                    PlaylistIndex--;
+                    if (PlaylistIndex <= 0)
                     {
-                        PlaylistIndex--;
-                        PlaylistPointer = PlaylistLength[PlaylistIndex] - 1;
+                        PlaylistIndex = (PlaylistCount - 1);
                     }
-                    else
-                    {
-                        PlaylistTempo = 0;
-                        PlaylistPointer = 0;
-                    }
+                    PlaylistPointer = PlaylistLength[PlaylistIndex] - 1;
                 }
             }
         }
@@ -308,17 +301,18 @@ function PlaylistFunc(F)
     switch (F)
     {
         case -3:
-            if (PlaylistIndex > 0)
+            PlaylistIndex--;
+            if (PlaylistIndex < 0)
             {
-                PlaylistIndex--;
-                if (PlaylistTempo < 0)
-                {
-                    PlaylistPointer = PlaylistLength[PlaylistIndex];
-                }
-                else
-                {
-                    PlaylistPointer = 0;
-                }
+                PlaylistIndex = (PlaylistCount - 1);
+            }
+            if (PlaylistTempo < 0)
+            {
+                PlaylistPointer = PlaylistLength[PlaylistIndex];
+            }
+            else
+            {
+                PlaylistPointer = 0;
             }
             break;
         case -2:
@@ -367,17 +361,18 @@ function PlaylistFunc(F)
             }
             break;
         case 3:
-            if (PlaylistIndex < (PlaylistCount - 1))
+            PlaylistIndex++;
+            if (PlaylistIndex > (PlaylistCount - 1))
             {
-                PlaylistIndex++;
-                if (PlaylistTempo < 0)
-                {
-                    PlaylistPointer = PlaylistLength[PlaylistIndex];
-                }
-                else
-                {
-                    PlaylistPointer = 0;
-                }
+                PlaylistIndex = 0;
+            }
+            if (PlaylistTempo < 0)
+            {
+                PlaylistPointer = PlaylistLength[PlaylistIndex];
+            }
+            else
+            {
+                PlaylistPointer = 0;
             }
             break;
     }

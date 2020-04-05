@@ -37,7 +37,13 @@ function FilterSettingsGet()
     document.getElementById("xSET_AudioPlayerEnabled").selectedIndex = SET_AudioPlayerEnabled;
     document.getElementById("xSET_AudioPlayerTimeStartMin").value = SET_AudioPlayerTimeStartMin;
     document.getElementById("xSET_AudioPlayerTimeStartMax").value = SET_AudioPlayerTimeStartMax;
+    document.getElementById("xSET_AudioPlayerBufTimeCorrectBound").value = SET_AudioPlayerBufTimeCorrectBound;
+    document.getElementById("xSET_AudioPlayerBufTimeCorrectCount").value = SET_AudioPlayerBufTimeCorrectCount;
+
     document.getElementById("xSET_AudioPlayerDrawBuf").selectedIndex = SET_AudioPlayerDrawBuf;
+    document.getElementById("xSET_AudioPlayerDiagBack").value = SET_AudioPlayerDiagBack;
+    document.getElementById("xSET_AudioPlayerDiagFore").value = SET_AudioPlayerDiagFore;
+
     document.getElementById("xSET_AudioPlayerMute").selectedIndex = SET_AudioPlayerMute;
 
     document.getElementById("xSET_FilterEnabled").selectedIndex = SET_FilterEnabled;
@@ -62,9 +68,15 @@ function FilterSettingsSet(Mode)
     var ColorTemp;
 
     SET_AudioPlayerEnabled = document.getElementById("xSET_AudioPlayerEnabled").selectedIndex;
-    SET_AudioPlayerTimeStartMin = Limit(document.getElementById("xSET_AudioPlayerTimeStartMin").value, 1, 1000000);
-    SET_AudioPlayerTimeStartMax = Limit(document.getElementById("xSET_AudioPlayerTimeStartMax").value, 1, 1000000);
+    SET_AudioPlayerTimeStartMin = Limit(document.getElementById("xSET_AudioPlayerTimeStartMin").value, 0, 1000000);
+    SET_AudioPlayerTimeStartMax = Limit(document.getElementById("xSET_AudioPlayerTimeStartMax").value, 0, 1000000);
+    SET_AudioPlayerBufTimeCorrectBound = Limit(document.getElementById("xSET_AudioPlayerBufTimeCorrectBound").value, 0, 1000000);
+    SET_AudioPlayerBufTimeCorrectCount = Limit(document.getElementById("xSET_AudioPlayerBufTimeCorrectCount").value, 0, 1000000);
+
     SET_AudioPlayerDrawBuf = document.getElementById("xSET_AudioPlayerDrawBuf").selectedIndex;
+    SET_AudioPlayerDiagBack = Limit(document.getElementById("xSET_AudioPlayerDiagBack").value, 0, 255);
+    SET_AudioPlayerDiagFore = Limit(document.getElementById("xSET_AudioPlayerDiagFore").value, 0, 255);
+
     SET_AudioPlayerMute = document.getElementById("xSET_AudioPlayerMute").selectedIndex;
 
     SET_FilterEnabled = document.getElementById("xSET_FilterEnabled").selectedIndex;
@@ -98,7 +110,11 @@ function FilterSettingsSet(Mode)
     DataSetI("SET_AudioPlayerEnabled", SET_AudioPlayerEnabled);
     DataSetI("SET_AudioPlayerTimeStartMin", SET_AudioPlayerTimeStartMin);
     DataSetI("SET_AudioPlayerTimeStartMax", SET_AudioPlayerTimeStartMax);
+    DataSetI("SET_AudioPlayerBufTimeCorrectBound", SET_AudioPlayerBufTimeCorrectBound);
+    DataSetI("SET_AudioPlayerBufTimeCorrectCount", SET_AudioPlayerBufTimeCorrectCount);
     DataSetI("SET_AudioPlayerDrawBuf", SET_AudioPlayerDrawBuf);
+    DataSetI("SET_AudioPlayerDiagBack", SET_AudioPlayerDiagBack);
+    DataSetI("SET_AudioPlayerDiagFore", SET_AudioPlayerDiagFore);
     DataSetI("SET_AudioPlayerMute", SET_AudioPlayerMute);
 
     DataSetI("SET_FilterEnabled", SET_FilterEnabled);

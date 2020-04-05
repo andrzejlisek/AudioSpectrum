@@ -1742,7 +1742,11 @@ function SettingsReset(M)
         DataDelete("SET_AudioPlayerEnabled");
         DataDelete("SET_AudioPlayerTimeStartMin");
         DataDelete("SET_AudioPlayerTimeStartMax");
+        DataDelete("SET_AudioPlayerBufTimeCorrectBound");
+        DataDelete("SET_AudioPlayerBufTimeCorrectCount");
         DataDelete("SET_AudioPlayerDrawBuf");
+        DataDelete("SET_AudioPlayerDiagBack");
+        DataDelete("SET_AudioPlayerDiagFore");
         DataDelete("SET_AudioPlayerMute");
     }
 

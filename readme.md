@@ -264,10 +264,23 @@ The settings related to autio playback and processing are in the **PLAYBACK** se
 
 
 * **Play output audio** \- Generate and play output audio \(directly or processed\)\. If AudioSpectrun is used to visualize input audio, this settings should be set into **No**\.
-* **Min play buffer \[ms\]** \- Minumum playbeck buffer time\.
-* **Max play buffer \[ms\]** \- Maximum playbeck buffer time\.
+* **Min play buffer \[ms\]** \- Minumum playback buffer time\.
+* **Max play buffer \[ms\]** \- Maximum playback buffer time\.
+* **Soft margin \[ms\]** \- The margin from min/max bound, where player starts periodically adding or removing one sample per period\.
+* **Sample add/remove period** \- Number of samples, per which player adds or removes one sample, when real playback buffer reaches soft margin\.
 * **Draw buffer on spectrogram** \- Diagnostic function, draws buffer indicator over spectrogram canvas, where the lower display edge represents the minimum time and the upper display edge represents the maximum time\. The spectrogram display zoom and offset does not matter\. This function can visualize buffer time fluctuation during playback\.
+* **Buffer background shade** \- The shade of gray to draw soft min/max bounds and middle playback buffer lines\.
+* **Buffer foreground shade** \- The shade of gray to draw hard min/max bounds lines and real playback buffer time\.
 * **Mute audio playback** \- Mute audio playback \(the sample values will be changed to dero directly before play\) while playing live \(recording\) audio or audio from playlist or in both cases\.
+
+The playback timing can slighty differ from recording timing, also due to perfomance\-demanding activities\. The playback buffer is the time between aquire audio data pack to play and placing the data in play timeline, so the times fluctuates during play\. This is very visible when drafing buffer on spectrogram is enabled and allow to test buffer parameters\. The **Min play buffer** and **Max play buffer** defines the hard play buffer bounds\. When player is initialized, the first playback buffer time equals to average time between hard bounds and there is a middle time\. The **Soft margin** defines the soft buffer bounds\. The lower soft bound is the lover hard bound increased by soft margin, and the upper soft bound is the upper hard bound decreased by soft margin\.
+
+During playing, there are possible the following scenarios:
+
+
+* When playback buffer time reaches beyond lower soft bound, for next audio chunks there will be added one sample \(copied from previos sample\) per certain period \(the sound pitch may me slighty decreased\), until the playback time will be upper than middle time\.
+* When playback buffer time reaches beyond upper soft bound, for next audio chunks there will be remover one sample per certain period \(the sound pitch may me slighty increased\), until the playback time will be lower than middle time\.
+* When playback buffer time reaches beyond lower or upper hard bound, the playback buffer time for next audio chunk will be changed to middle time and small distortion will be audible\.
 
 # Process control
 
