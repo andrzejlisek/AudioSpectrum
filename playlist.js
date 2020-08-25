@@ -129,16 +129,36 @@ function PlaylistRefreshTable()
 
 function PlaylistRemove(N)
 {
+    var IndexChange = false;
     if (PlaylistCount > 1)
     {
         if ((PlaylistIndex + 1) == PlaylistCount)
         {
             PlaylistIndex--;
         }
+        else
+        {
+            if ((PlaylistIndex) >= N)
+            {
+                if (PlaylistIndex > 0)
+                {
+                    PlaylistIndex--;
+                }
+                else
+                {
+                    if (PlaylistTempo < 0)
+                    {
+                        PlaylistIndex = PlaylistCount - 2;
+                    }
+                    IndexChange = true;
+                }
+            }
+        }
     }
     else
     {
         PlaylistIndex = -1;
+        PlaylistPointer = 0;
     }
 
 
@@ -150,6 +170,18 @@ function PlaylistRemove(N)
     PlaylistChannels.splice(N, 1);
     PlaylistSamplerate.splice(N, 1);
     PlaylistRefreshTable();
+
+    if (IndexChange)
+    {
+        if (PlaylistTempo < 0)
+        {
+            PlaylistPointer = PlaylistLength[PlaylistIndex];
+        }
+        else
+        {
+            PlaylistPointer = 0;
+        }
+    }
 }
 
 function PlaylistMove(N1, N2)
@@ -191,7 +223,17 @@ function PlaylistMoveU(N)
 {
     if (N > 0)
     {
-        PlaylistIndex--;
+        if (PlaylistIndex == N)
+        {
+            PlaylistIndex--;
+        }
+        else
+        {
+            if (PlaylistIndex == (N - 1))
+            {
+                PlaylistIndex++;
+            }
+        }
         PlaylistMove(N, N - 1);
     }
 }
@@ -200,7 +242,17 @@ function PlaylistMoveD(N)
 {
     if (N < (PlaylistCount - 1))
     {
-        PlaylistIndex++;
+        if (PlaylistIndex == N)
+        {
+            PlaylistIndex++;
+        }
+        else
+        {
+            if (PlaylistIndex == (N + 1))
+            {
+                PlaylistIndex--;
+            }
+        }
         PlaylistMove(N, N + 1);
     }
 }

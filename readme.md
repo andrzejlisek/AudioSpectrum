@@ -8,7 +8,7 @@ AudioSpectrum is audio viewer and processor, which work in web browser\. It cons
 * **Spectrogram** \- display sound spectrogram\.
 * **Stereo scope** \- display side\-mid or left\-right in X\-Y mode\.
 * **Filter** \- create finited\-impulse\-response brick\-wall frequency filter\.
-* **Process control** \- set filter processing including brick\-wall filter, adding noise and volume control\.
+* **Process control** \- set filter processing including brick\-wall filter, adding noise and volume control and place frequency markers\.
 * **Playlist** \- play audio from file instead of live audio recording\.
 
 Example AudioSpectrum pusposes:
@@ -89,6 +89,7 @@ At the bottom of settings screen, there are several button, which allows to rest
 * **Reset filter settings**
 * **Clear filter slots**
 * **Clear process slots**
+* **Clear frequency markers**
 
 Every buttons resets the settings as labeled\. After clicking any of these button, you have to restart AudioSpectrum by page refresh to take effect\.
 
@@ -160,6 +161,7 @@ The informations and settings related to spectrogram module are in the **SPECTRO
 * **Audio gain R x1000** \- Red color channel value gain, usable to change color tint\. This value may not to be confused with spectrum gain\.
 * **Audio gain G x1000** \- Green color channel value gain, usable to change color tint\. This value may not to be confused with spectrum gain\.
 * **Audio gain B x1000** \- Blue color channel value gain, usable to change color tint\. This value may not to be confused with spectrum gain\.
+* **Marker size** \- Frequency marker line width on spectrogram\. This actual marker line width will be rounded to nearest multiply of frequency pixel size\.
 
 # Stereo scope
 
@@ -240,6 +242,12 @@ The buttons available, when none of band is selected:
 
 * **None/Hamming/Blackman** \- Windowing formula\.
 * **Win\-, Win\+** \- Length of filtering window\.
+* **\[\+\], \[\-\]** \- Zoom in or zoom out filter view
+* **\[<<\], \[>>\]** \- Move viewed part of filter, whet it is zoomed\.
+
+## Changing the position value unit
+
+The default unit used in the filter band position is the number of elementary units\. You can change this unit to sound frequency and from sound frequency\. To do this, click the **<<** or **>>** several times \(not to be confused with **\[<<\]** or **\[>>\]**\) to reach the state, when no band is selected and press the same button one more time to select the opposite band\. The filter working will not be changed\. The value using the selected unit is displayed on the **&#124;<**, **&#124;>**, **<&#124;** and **>&#124;** buttons \(change band frequency\)\.
 
 ## Settings
 
@@ -259,6 +267,7 @@ The settings related to Filter module are in the **FILTER** section:
 * **Zero line color** \- Color of line, which displays 0dB level\.
 * **Spectrum color** \- Color of computed filter frequency response\.
 * **Level line color** \- Color of level line, which represent ideal frequency response and indicates input filter levels\.
+* **Marker size** \- Frequency marker line width on filter graph\.
 
 The settings related to autio playback and processing are in the **PLAYBACK** section:
 
@@ -297,6 +306,8 @@ This module provides the audio processing configuration by series of process tra
 * **Invert R** \- Invert right channel phase\.
 * **Swap stereo** \- Swap left and right channels\.
 
+The other purpose of this module is setting frequency markers to display\.
+
 ## Creating transform list
 
 To add transform, you have to click **Add before first** or **Add after last** button\. The **Settings** button brings screen of settings, the **Step\-** and **Step\+** changes gain value change step\. The transform is shown in table\. In the **Transform** column there are three buttons\. The first of them removes the transform and the other buttons moves transform up or down across the table to change transform order\. The drop\-down list allows to choose transform operation\. In the columns **Left**, **Right**, **Mid** and **Side**, you can choose filter slot or change gain for this channel\. Sobe transforms has no parameters to change\.
@@ -309,6 +320,15 @@ Below the transform table, there are buttons, which allows to save and load whol
 * **Save X** \- Save process configuration into X slot\.
 * **Load X** \- Load configuration from X slot\.
 * **Clear X** \- Clear X slot\.
+
+## Frequency markers
+
+In the **Process control** module, you can also set up to 10 frequency markers, which will be displayed on the spectrogram and on the filter graph\. To display marker, check the checkbox in the **Marker** column, next to the number from 0 to 9\. In the **Color** column, you can define the marker color\. The **Value** column determines the place of the marker within filter and spectrogram frequency range\. The value is in one of the following units, which can be choosen in the **Unit** column:
+
+
+* **Hz** \- The sound frequency value in **Hertz**, to set the specified sound frequency\.
+* **/10000** \- The 1 of 10000 parts, to set the placement as fraction of the whole band\.
+* **/8192** \- The 1 of 8192 parts, to set the placement as fraction of the whole band, the unit can help to place the marker accurately on the spectrogram by frequency pixels\.
 
 # Playlist
 
@@ -345,6 +365,8 @@ To manage playing files from playlist, you can use the buttons above playlist ta
 * **>>** \- Increase forward play speed or decrease backward playing speed\.
 * **>&#124;** \- Next item
 
-The playing base speed will be accord to recording sample rate, not to file sample rate\. The playlist storing is not possible because JavaScript API does not provide automatically loading files by file path and name\.
+The playing base speed will be accord to recording sample rate, not to file sample rate\. The playlist storing is not possible because JavaScript API does not provide automatically loading files basen on the file path and name\.
+
+
 
 

@@ -5,6 +5,8 @@ var FilterSlotObj = function(FilterNo_)
     this.FilterWindowSize = 500;
 
     this.FilterConfSize = 2048;
+    
+    this.PosHz = 0;
 
     // 0 ==> None
     // 1 ==> Blackman window

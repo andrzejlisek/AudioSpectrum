@@ -4,6 +4,7 @@
     if (!SET_ColorPicker)
     {
         Obj.type = "text";
+        Obj.size = "5";
     }
 }
 SetColorPicker("xSET_DrawStripColor");
@@ -13,9 +14,20 @@ SetColorPicker("xSET_FilterColorBack");
 SetColorPicker("xSET_FilterColorZero");
 SetColorPicker("xSET_FilterColorSpec");
 SetColorPicker("xSET_FilterColorLine");
+SetColorPicker("xSET_Marker0Color");
+SetColorPicker("xSET_Marker1Color");
+SetColorPicker("xSET_Marker2Color");
+SetColorPicker("xSET_Marker3Color");
+SetColorPicker("xSET_Marker4Color");
+SetColorPicker("xSET_Marker5Color");
+SetColorPicker("xSET_Marker6Color");
+SetColorPicker("xSET_Marker7Color");
+SetColorPicker("xSET_Marker8Color");
+SetColorPicker("xSET_Marker9Color");
 
 PlaylistTable = document.getElementById("Playlist");
 PlaylistInfo = document.getElementById("PlaylistInfo");
+MarkerInit();
 ScopeInit();
 FilterInit();
 SetLayout();

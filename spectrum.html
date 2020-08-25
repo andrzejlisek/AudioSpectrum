@@ -13,6 +13,7 @@
         <script src="processfilterobj.js"></script>
         <script src="process.js"></script>
         <script src="processstorage.js"></script>
+        <script src="marker.js"></script>
         <script src="draw.js"></script>
         <script src="layout.js"></script>
         <script src="core.js"></script>
@@ -458,6 +459,10 @@
                     <td><label for="xSET_AudioGainB">Audio gain B x1000:</label></td>
                     <td><input type="text" id="xSET_AudioGainB" onchange="SettingBtn(4);" size="5"></td>
                 </tr>
+                <tr>
+                    <td><label for="xSET_MarkerSThickness">Marker size:</label></td>
+                    <td><input type="text" id="xSET_MarkerSThickness" onchange="MarkerSettingsSet();" size="5"></td>
+                </tr>
 
                 <tr>
                     <td colspan="2"><hr></td>
@@ -735,6 +740,10 @@
                     <td><input type="color" id="xSET_FilterColorLine" onchange="FilterSettingsSet(1);" size="5"></td>
                 </tr>
                 <tr>
+                    <td><label for="xSET_MarkerFThickness">Marker size:</label></td>
+                    <td><input type="text" id="xSET_MarkerFThickness" onchange="MarkerSettingsSet();" size="5"></td>
+                </tr>
+                <tr>
                     <td colspan="2"><hr></td>
                 </tr>
             </table>
@@ -756,6 +765,7 @@
             <input type="button" value="Reset filter settings" onclick="SettingsReset(6);"><br>
             <input type="button" value="Clear filter slots" onclick="SettingsReset(7);"><br>
             <input type="button" value="Clear process slots" onclick="SettingsReset(8);"><br>
+            <input type="button" value="Clear frequency markers" onclick="SettingsReset(9);"><br>
         </div>
 
 
@@ -1179,16 +1189,22 @@
             <br>
             <table border="1" cellpadding="0" cellspacing="0" id="ProcessTable">
                 <tr>
-                    <td colspan="2">Transform</td>
-                    <td>Left</td>
-                    <td>Right</td>
-                    <td>Mid</td>
-                    <td>Side</td>
+                    <th colspan="2">Transform</th>
+                    <th>Left</th>
+                    <th>Right</th>
+                    <th>Mid</th>
+                    <th>Side</th>
                 </tr>
             </table>
             <br>
 
             <table border="1" cellpadding="0" cellspacing="0">
+                <caption>Transform configurations</caption>
+                <tr>
+                    <th>Save</th>
+                    <th>Load</th>
+                    <th>Clear</th>
+                </tr>
                 <tr>
                     <td><input type="button" onclick="ProcessSave(0)" value="Save 0"></td>
                     <td><input type="button" onclick="ProcessLoad(0)" value="Load 0"></td>
@@ -1240,6 +1256,86 @@
                     <td><input type="button" onclick="ProcessClear(9)" value="Clear 9"></td>
                 </tr>
             </table>
+            <hr>
+            <table border="1" cellpadding="0" cellspacing="0">
+                <caption>Frequency markers</caption>
+                <tr>
+                    <th colspan="2">Marker</th>
+                    <th>Color</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker0Vis">0</label></td>
+                    <td><input type="checkbox" id="xSET_Marker0Vis" onchange="MarkerForm(0)"></td>
+                    <td><input type="color" id="xSET_Marker0Color" onchange="MarkerForm(0)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker0Freq" onchange="MarkerForm(0)"></td>
+                    <td><select id="xSET_Marker0Unit" onchange="MarkerForm(0)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker1Vis">1</label></td>
+                    <td><input type="checkbox" id="xSET_Marker1Vis" onchange="MarkerForm(1)"></td>
+                    <td><input type="color" id="xSET_Marker1Color" onchange="MarkerForm(1)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker1Freq" onchange="MarkerForm(1)"></td>
+                    <td><select id="xSET_Marker1Unit" onchange="MarkerForm(1)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker2Vis">2</label></td>
+                    <td><input type="checkbox" id="xSET_Marker2Vis" onchange="MarkerForm(2)"></td>
+                    <td><input type="color" id="xSET_Marker2Color" onchange="MarkerForm(2)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker2Freq" onchange="MarkerForm(2)"></td>
+                    <td><select id="xSET_Marker2Unit" onchange="MarkerForm(2)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker3Vis">3</label></td>
+                    <td><input type="checkbox" id="xSET_Marker3Vis" onchange="MarkerForm(3)"></td>
+                    <td><input type="color" id="xSET_Marker3Color" onchange="MarkerForm(3)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker3Freq" onchange="MarkerForm(3)"></td>
+                    <td><select id="xSET_Marker3Unit" onchange="MarkerForm(3)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker4Vis">4</label></td>
+                    <td><input type="checkbox" id="xSET_Marker4Vis" onchange="MarkerForm(4)"></td>
+                    <td><input type="color" id="xSET_Marker4Color" onchange="MarkerForm(4)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker4Freq" onchange="MarkerForm(4)"></td>
+                    <td><select id="xSET_Marker4Unit" onchange="MarkerForm(4)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker5Vis">5</label></td>
+                    <td><input type="checkbox" id="xSET_Marker5Vis" onchange="MarkerForm(5)"></td>
+                    <td><input type="color" id="xSET_Marker5Color" onchange="MarkerForm(5)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker5Freq" onchange="MarkerForm(5)"></td>
+                    <td><select id="xSET_Marker5Unit" onchange="MarkerForm(5)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker6Vis">6</label></td>
+                    <td><input type="checkbox" id="xSET_Marker6Vis" onchange="MarkerForm(6)"></td>
+                    <td><input type="color" id="xSET_Marker6Color" onchange="MarkerForm(6)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker6Freq" onchange="MarkerForm(6)"></td>
+                    <td><select id="xSET_Marker6Unit" onchange="MarkerForm(6)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker7Vis">7</label></td>
+                    <td><input type="checkbox" id="xSET_Marker7Vis" onchange="MarkerForm(7)"></td>
+                    <td><input type="color" id="xSET_Marker7Color" onchange="MarkerForm(7)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker7Freq" onchange="MarkerForm(7)"></td>
+                    <td><select id="xSET_Marker7Unit" onchange="MarkerForm(7)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker8Vis">8</label></td>
+                    <td><input type="checkbox" id="xSET_Marker8Vis" onchange="MarkerForm(8)"></td>
+                    <td><input type="color" id="xSET_Marker8Color" onchange="MarkerForm(8)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker8Freq" onchange="MarkerForm(8)"></td>
+                    <td><select id="xSET_Marker8Unit" onchange="MarkerForm(8)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Marker9Vis">9</label></td>
+                    <td><input type="checkbox" id="xSET_Marker9Vis" onchange="MarkerForm(9)"></td>
+                    <td><input type="color" id="xSET_Marker9Color" onchange="MarkerForm(9)"></td>
+                    <td><input type="text" size="3" id="xSET_Marker9Freq" onchange="MarkerForm(9)"></td>
+                    <td><select id="xSET_Marker9Unit" onchange="MarkerForm(9)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
+                </tr>
+            </table>
         </div>
         <!-- Process end -->
 
@@ -1263,12 +1359,12 @@
             <br>
             <table id="Playlist" border="1" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td>Operations</td>
-                    <td>Index</td>
-                    <td>File&nbsp;name</td>
-                    <td>Sample&nbsp;rate</td>
-                    <td>Channels</td>
-                    <td>Length</td>
+                    <th>Operations</th>
+                    <th>Index</th>
+                    <th>File&nbsp;name</th>
+                    <th>Sample&nbsp;rate</th>
+                    <th>Channels</th>
+                    <th>Length</th>
                 </tr>
             </table>
             Add audio files: <input type="file" id="AudioRecordFile" onchange="PlaylistLoadFile()" multiple="multiple">

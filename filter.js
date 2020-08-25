@@ -32,6 +32,9 @@ var FilterSlotCount = 4;
 
 var FilterSlot = new Array(FilterSlotCount);
 
+var FilterDrawZoom = 1;
+var FilterDrawOffset = 0;
+
 function FilterSettingsGet()
 {
     document.getElementById("xSET_AudioPlayerEnabled").selectedIndex = SET_AudioPlayerEnabled;
@@ -395,6 +398,54 @@ function FilterBtnAction(N)
             {
                 FSC.FilterArraySelected = (FSC.FilterArrayPoint.length - 2);
             }
+            if (FSC.FilterArraySelected < 0)
+            {
+                if (N == 16)
+                {
+                    if (FSC.PosHz)
+                    {
+                        FSC.PosHz = 5;
+                    }
+                    else
+                    {
+                        FSC.PosHz = 4;
+                    }
+                }
+                if (N == 17)
+                {
+                    if (FSC.PosHz)
+                    {
+                        FSC.PosHz = 3;
+                    }
+                    else
+                    {
+                        FSC.PosHz = 2;
+                    }
+                }
+            }
+            else
+            {
+                if (N == 16)
+                {
+                    switch (FSC.PosHz) 
+                    {
+                        case 2: FSC.PosHz = 0; break;
+                        case 3: FSC.PosHz = 1; break;
+                        case 4: FSC.PosHz = 1; break;
+                        case 5: FSC.PosHz = 0; break;
+                    }
+                }
+                if (N == 17)
+                {
+                    switch (FSC.PosHz) 
+                    {
+                        case 2: FSC.PosHz = 1; break;
+                        case 3: FSC.PosHz = 0; break;
+                        case 4: FSC.PosHz = 0; break;
+                        case 5: FSC.PosHz = 1; break;
+                    }
+                }
+            }
             break;
         case 18: // Add
             FSC.FilterAdd();
@@ -409,16 +460,44 @@ function FilterBtnAction(N)
             FSC.FilterVal(0 + StepVal[SET_FilterValueStep], SET_Filter_FilterLevMin, SET_Filter_FilterLevMax);
             break;
         case 22: // |<
-            FSC.FilterPos(0, 0 - StepVal[SET_FilterValueStep]);
+            if (FSC.FilterArraySelected < 0)
+            {
+                FilterSetZoom(1);
+            }
+            else
+            {
+                FSC.FilterPos(0, 0 - StepVal[SET_FilterValueStep]);
+            }
             break;
         case 23: // |>
-            FSC.FilterPos(0, 0 + StepVal[SET_FilterValueStep]);
+            if (FSC.FilterArraySelected < 0)
+            {
+                FilterSetZoom(2);
+            }
+            else
+            {
+                FSC.FilterPos(0, 0 + StepVal[SET_FilterValueStep]);
+            }
             break;
         case 24: // <|
-            FSC.FilterPos(1, 0 - StepVal[SET_FilterValueStep]);
+            if (FSC.FilterArraySelected < 0)
+            {
+                FilterSetZoom(3);
+            }
+            else
+            {
+                FSC.FilterPos(1, 0 - StepVal[SET_FilterValueStep]);
+            }
             break;
         case 25: // >|
-            FSC.FilterPos(1, 0 + StepVal[SET_FilterValueStep]);
+            if (FSC.FilterArraySelected < 0)
+            {
+                FilterSetZoom(4);
+            }
+            else
+            {
+                FSC.FilterPos(1, 0 + StepVal[SET_FilterValueStep]);
+            }
             break;
     }
     FSC.FilterCalcWindow(SET_Filter_FilterFFT, SET_Filter_FilterLevMin);
@@ -426,9 +505,88 @@ function FilterBtnAction(N)
 }
 
 
+function FilterPoint(FObj, V)
+{
+    if (FObj.PosHz)
+    {
+        if (CurrentSamplerate > 0)
+        {
+            var T = V / FObj.FilterArrayPoint[FObj.FilterArrayPoint.length - 1];
+            T = T * CurrentSamplerate;
+            T = T / 2;
+            return LabelVal(T * 100, 2) + " Hz";
+        }
+        else
+        {
+            return "0 Hz";
+        }
+    }
+    else
+    {
+        return V + "/" + FObj.FilterArrayPoint[FObj.FilterArrayPoint.length - 1];
+    }
+}
+
+function FilterOffsetCount()
+{
+    return FilterDrawZoom + FilterDrawZoom - 1;
+}
+
+function FilterSetZoom(Mode)
+{
+//var FilterDrawZoom = 1;
+//var FilterDrawOffset = 0;
+
+    switch(Mode)
+    {
+        case 1:
+            if (FilterDrawZoom < 64)
+            {
+                FilterDrawZoom = Math.round(FilterDrawZoom * 2);
+                FilterDrawOffset = Math.round(FilterDrawOffset * 2 + 1);
+            }
+            break;
+        case 2:
+            if (FilterDrawZoom > 1)
+            {
+                FilterDrawZoom = Math.round(FilterDrawZoom / 2);
+                if (FilterDrawOffset > ((FilterDrawZoom * 2) - 1))
+                {
+                    FilterDrawOffset = Math.floor((FilterDrawOffset - 1) / 2);
+                }
+                else
+                {
+                    FilterDrawOffset = Math.ceil((FilterDrawOffset - 1) / 2);
+                }
+                if (FilterDrawOffset < 0)
+                {
+                    FilterDrawOffset = 0;
+                }
+                if (FilterDrawOffset > (FilterDrawZoom + FilterDrawZoom - 2))
+                {
+                    FilterDrawOffset = (FilterDrawZoom + FilterDrawZoom - 2);
+                }
+            }
+            break;
+        case 3:
+            if (FilterDrawOffset > 0)
+            {
+                FilterDrawOffset--;
+            }
+            break;
+        case 4:
+            if (FilterDrawOffset < (FilterOffsetCount() - 1))
+            {
+                FilterDrawOffset++;
+            }
+            break;
+    }
+    FilterDraw();
+}
 
 function FilterDraw()
 {
+    var FilterDrawOffset_ = Math.round(FilterDrawOffset * 0.5 * FilterCanvasW);
     var FSC = FilterSlot[SET_FilterSlotCurrent];
     if (!FSC)
     {
@@ -455,6 +613,7 @@ function FilterDraw()
     {
         LineSize = LineFactor;
     }
+    LineSize = LineSize * FilterDrawZoom;
 
     for (var I = 0; I < (FFT_FourierBase / 2); I++)
     {
@@ -464,7 +623,7 @@ function FilterDraw()
         L1 = Math.round(FilterCanvasH - 1 - FilterDrawZero - (L1 * FilterDrawFact));
         L2 = Math.round(FilterCanvasH - 1 - FilterDrawZero - (L2 * FilterDrawFact));
 
-        var XX = Math.round(I * LineFactor);
+        var XX = Math.round(I * LineFactor * FilterDrawZoom) - FilterDrawOffset_;
 
         if (L1 > L2)
         {
@@ -479,12 +638,12 @@ function FilterDraw()
 
 
     var L = FSC.FilterArrayPoint.length - 1;
-    var T = FilterCanvasW / FSC.FilterConfSize;
+    var T = FilterDrawZoom * FilterCanvasW / FSC.FilterConfSize;
     for (var I = 0; I < L; I++)
     {
         var Lev = Math.round(FilterCanvasH - 1 - FilterDrawZero - (FSC.FilterArrayLevel[I] * FilterDrawFact));
-        var IIMin = Math.round(FSC.FilterArrayPoint[I] * T);
-        var IIMax = Math.round(FSC.FilterArrayPoint[I + 1] * T);
+        var IIMin = Math.round(FSC.FilterArrayPoint[I] * T) - FilterDrawOffset_;
+        var IIMax = Math.round(FSC.FilterArrayPoint[I + 1] * T) - FilterDrawOffset_;
         if (I == FSC.FilterArraySelected)
         {
             FilterDrawRect(IIMin, Lev - 2, IIMax - IIMin, 5, SET_FilterColorLineR, SET_FilterColorLineG, SET_FilterColorLineB);
@@ -492,6 +651,14 @@ function FilterDraw()
         else
         {
             FilterDrawRectX(IIMin, Lev, IIMax - IIMin, SET_FilterColorLineR, SET_FilterColorLineG, SET_FilterColorLineB);
+        }
+    }
+
+    for (var I = 0; I < MarkerCountF; I++)
+    {
+        for (var II = MarkerF_1; II <= MarkerF_2; II++)
+        {
+            FilterDrawRectY(II - FilterDrawOffset_ + Math.round(FilterDrawZoom * FilterCanvasW * MarkerFreqF[I]), 0, FilterCanvasH, MarkerColorRF[I], MarkerColorGF[I], MarkerColorBF[I]);
         }
     }
 
@@ -517,11 +684,11 @@ function FilterDraw()
         FilterBtnSetLabel("VD", "Level-\n" + FilterValue(FSC.FilterArrayLevel[FSC.FilterArraySelected], 1));
         FilterBtnSetLabel("VU", "Level+\n" + FilterValue(FSC.FilterArrayLevel[FSC.FilterArraySelected], 1));
 
-        FilterBtnSetLabel("LL", "|<\n" + FSC.FilterArrayPoint[FSC.FilterArraySelected]);
-        FilterBtnSetLabel("LR", "|>\n" + FSC.FilterArrayPoint[FSC.FilterArraySelected]);
+        FilterBtnSetLabel("LL", "|<\n" + FilterPoint(FSC, FSC.FilterArrayPoint[FSC.FilterArraySelected]));
+        FilterBtnSetLabel("LR", "|>\n" + FilterPoint(FSC, FSC.FilterArrayPoint[FSC.FilterArraySelected]));
 
-        FilterBtnSetLabel("RL", "<|\n" + (FSC.FilterArrayPoint[FSC.FilterArraySelected + 1] - 1));
-        FilterBtnSetLabel("RR", ">|\n" + (FSC.FilterArrayPoint[FSC.FilterArraySelected + 1] - 1));
+        FilterBtnSetLabel("RL", "<|\n" + FilterPoint(FSC, FSC.FilterArrayPoint[FSC.FilterArraySelected + 1] - 1));
+        FilterBtnSetLabel("RR", ">|\n" + FilterPoint(FSC, FSC.FilterArrayPoint[FSC.FilterArraySelected + 1] - 1));
     }
     else
     {
@@ -544,11 +711,11 @@ function FilterDraw()
         FilterBtnSetLabel("VD", "Win-\n" + FSC.FilterWindowSize);
         FilterBtnSetLabel("VU", "Win+\n" + FSC.FilterWindowSize);
 
-        FilterBtnSetLabel("LL", "");
-        FilterBtnSetLabel("LR", "");
+        FilterBtnSetLabel("LL", "[+]\n" + FilterDrawZoom);
+        FilterBtnSetLabel("LR", "[-]\n" + FilterDrawZoom);
 
-        FilterBtnSetLabel("RL", "");
-        FilterBtnSetLabel("RR", "");
+        FilterBtnSetLabel("RL", "[<<]\n" + (FilterDrawOffset + 1) + "/" + FilterOffsetCount());
+        FilterBtnSetLabel("RR", "[>>]\n" + (FilterDrawOffset + 1) + "/" + FilterOffsetCount());
     }
 
     ProcessListUpdateFilters();

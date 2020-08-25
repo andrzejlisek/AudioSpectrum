@@ -365,6 +365,8 @@ function AudioCallback(raw)
         var Zoom1;
         var Zoom2;
         var I_;
+        var I_M;
+        var I_M_Start;
         var IsOverdrive_;
         var IsOverdrive;
         var DatumR;
@@ -433,6 +435,7 @@ function AudioCallback(raw)
             }
 
             LenO = DISP_Offs * Len / 64;
+            I_M_Start = 0;
             for (var i = 0; i < CanvasLine; i++)
             {
                 if (SET_FlipBand)
@@ -469,6 +472,20 @@ function AudioCallback(raw)
                     WaveDisplayCanvasDataR = DrawPaletteR[DatumR];
                     WaveDisplayCanvasDataG = DrawPaletteG[DatumG];
                     WaveDisplayCanvasDataB = DrawPaletteB[DatumB];
+                }
+                if (DISP_VU__ == 0)
+                {
+                    for (I_M = I_M_Start; I_M < MarkerCountS; I_M++)
+                    {
+                        if (I_ == MarkerFreqS[I_M])
+                        {
+                            WaveDisplayCanvasDataR = MarkerColorRS[I_M];
+                            WaveDisplayCanvasDataG = MarkerColorGS[I_M];
+                            WaveDisplayCanvasDataB = MarkerColorBS[I_M];
+                            I_M_Start = I_M;
+                            break;
+                        }
+                    }
                 }
                 DrawRectX(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointer0 << CanvasDrawStepX, CanvasLineY0 + CanvasLine - i - 1, CanvasDrawStep, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
                 if (DISP_Mode == 1)
@@ -733,6 +750,7 @@ function gotStream(stream)
     audioRecorder = new Recorder(inputPoint);
     audioRecorder.SetCallback(AudioCallback);
     CurrentSamplerate = audioContext.sampleRate;
+    MarkerCalc();
     InitPalette();
     SetFFT();
     SetScope();
@@ -1226,6 +1244,7 @@ function SetFFT()
     {
         FFTDecimation = 1 << FFTDecimationX;
     }
+    MarkerCalc();
 
     audioRecorder.Msg({ command: 'fft', WORK_Spectrum: WORK_Spectrum, DispMode: DISP_VU__, FFT: FFT_, Win: Win_, FFTWin: SET_FFTWindow, FFTDecimation: FFTDecimation, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: AudioModeVal, DispSize: (DISP_Line * WaveDisplayCanvasWX) - Math.ceil(SET_DrawStripSize / CanvasDrawStep) + 1, BufTick: Math.ceil(SET_BufTick / CanvasDrawStep), LogBase: SET_DrawLogBase, LogFactor: SET_DrawLogFactor / 1000, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
 }
@@ -1473,6 +1492,7 @@ function SettingsShow()
     ScopeSettingsGet();
     LayoutSettingsGet();
     FilterSettingsGet();
+    MarkerSettingsGet();
 
     document.getElementById("Settings").style.display = "block";
 }
@@ -1520,6 +1540,7 @@ function SettingBtn(Cmd)
             SET_DrawLogFactor = Limit(document.getElementById("xSET_DrawLogFactor").value, 1, 1000000);
             DispBaseLimit();
             SET_SampleDecimation = Limit(document.getElementById("xSET_SampleDecimation").value, 1, 1000);
+            MarkerCalc();
             SET_MinimumStep = document.getElementById("xSET_MinimumStep").selectedIndex + 3;
             SET_MaximumResolution = document.getElementById("xSET_MaximumResolution").selectedIndex + 5;
             SET_FFTWindow = document.getElementById("xSET_FFTWindow").selectedIndex;
@@ -1800,6 +1821,8 @@ function SettingsReset(M)
         DataDelete("DISP_Line");
         DataDelete("DISP_Mode");
         DataDelete("DISP_VU__");
+
+        DataDelete("SET_MarkerSThickness");
     }
 
     // Reset stereo scope
@@ -1857,6 +1880,8 @@ function SettingsReset(M)
 
         DataDelete("SET_FilterSlotCurrent");
         DataDelete("SET_FilterValueStep");
+
+        DataDelete("SET_MarkerFThickness");
     }
 
     // Clear filter slots
@@ -1893,5 +1918,20 @@ function SettingsReset(M)
         DataDelete("OBJ_Process_Slot8_Filter");
         DataDelete("OBJ_Process_Slot9");
         DataDelete("OBJ_Process_Slot9_Filter");
+    }
+
+    // Clear frequency markers
+    if (M == 9)
+    {
+        // marker.js
+        for (var I = 0; I < 10; I++)
+        {
+            DataDelete("SET_Marker" + I + "Vis");
+            DataDelete("SET_Marker" + I + "ColorR");
+            DataDelete("SET_Marker" + I + "ColorG");
+            DataDelete("SET_Marker" + I + "ColorB");
+            DataDelete("SET_Marker" + I + "Freq");
+            DataDelete("SET_Marker" + I + "Unit");
+        }
     }
 }
