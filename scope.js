@@ -17,7 +17,7 @@ var SET_ScopeStep = DataGetIDefault("SET_ScopeStep", 0);
 
 var SET_ScopeOrientation = DataGetIDefault("SET_ScopeOrientation", 5);
 var SET_ScopeToolbarSize = DataGetIDefault("SET_ScopeToolbarSize", 20);
-var SET_ScopeToolbarPosition = DataGetIDefault("SET_ScopeToolbarPosition", 0);
+var SET_ScopeToolbarPosition = DataGetIDefault("SET_ScopeToolbarPosition", 3);
 
 var SET_ScopeBackColorR = DataGetIDefault("SET_ScopeBackColorR", 128);
 var SET_ScopeBackColorG = DataGetIDefault("SET_ScopeBackColorG", 128);
@@ -63,6 +63,7 @@ function ScopeSetLayout()
     ScopeDisplayCanvasObject.width = SET_ScopeW;
     ScopeDisplayCanvasObject.height = SET_ScopeH;
     ScopeDisplayCanvasData = ScopeDisplayCanvasContext.createImageData(SET_ScopeW, SET_ScopeH);
+    DrawClear(ScopeDisplayCanvasData, SET_ScopeW, SET_ScopeH);
 
 
     var ToolbarH1 = document.getElementById("AppOscilloscopeToolbarH1");

@@ -299,6 +299,8 @@ function ProcessSetButtons(N)
     Temp += "<option>Invert L</option>";
     Temp += "<option>Invert R</option>";
     Temp += "<option>Swap stereo</option>";
+    Temp += "<option>Stereo - MS (1)</option>";
+    Temp += "<option>Stereo - MS (2)</option>";
     Temp += "</select>";
     C2.innerHTML = Temp;
 
@@ -516,6 +518,24 @@ function ProcessAudio(BufLen, ChIL, ChIR, ChOL, ChOR)
                     var Temp = ChOL[Pointer];
                     ChOL[Pointer] = ChOR[Pointer];
                     ChOR[Pointer] = Temp;
+                }
+                break;
+            case 7: // Stereo - MS (2)
+                for (var Pointer = 0; Pointer < BufLen; Pointer++)
+                {
+                    var Val1 = ((ChOL[Pointer] + ChOR[Pointer]));
+                    var Val2 = ((ChOL[Pointer] - ChOR[Pointer]));
+                    ChOL[Pointer] = Val1;
+                    ChOR[Pointer] = Val2;
+                }
+                break;
+            case 8: // Stereo - MS (1)
+                for (var Pointer = 0; Pointer < BufLen; Pointer++)
+                {
+                    var Val1 = ((ChOL[Pointer] + ChOR[Pointer]) / 2);
+                    var Val2 = ((ChOL[Pointer] - ChOR[Pointer]) / 2);
+                    ChOL[Pointer] = Val1;
+                    ChOR[Pointer] = Val2;
                 }
                 break;
         }

@@ -1,5 +1,5 @@
 var SET_FilterEnabled = DataGetIDefault("SET_FilterEnabled", 0);
-var SET_FilterToolbarPosition = DataGetIDefault("SET_FilterToolbarPosition", 0);
+var SET_FilterToolbarPosition = DataGetIDefault("SET_FilterToolbarPosition", 3);
 var SET_FilterToolbarSize = DataGetIDefault("SET_FilterToolbarSize", 20);
 
 var SET_Filter_FilterLevMin = DataGetIDefault("SET_Filter_FilterLevMin", -80);
@@ -351,6 +351,8 @@ function FilterSetLayout()
     FilterDisplayCanvasObject.width = FilterCanvasW_;
     FilterDisplayCanvasObject.height = FilterCanvasH_;
     FilterDisplayCanvasData = FilterDisplayCanvasContext.createImageData(FilterCanvasW_, FilterCanvasH_);
+    DrawClear(FilterDisplayCanvasData, FilterCanvasW_, FilterCanvasH_);
+
 
     FilterDisplayCanvasObject.style["width"] = AppFilterM_clientWidth + "px";
     FilterDisplayCanvasObject.style["height"] = AppFilterM_clientHeight + "px";

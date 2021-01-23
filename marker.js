@@ -123,96 +123,114 @@ function MarkerCalc()
                 var ValS = 0;
                 if (SET_MarkerUnit[I] == 0)
                 {
-                    ValF = (SET_MarkerFreq[I] * 2) / CurrentSamplerate;
-                    ValS = (SET_MarkerFreq[I] * 2) / (CurrentSamplerate / SET_SampleDecimation) * Reso_;
+                    ValF = SET_MarkerFreq[I] / (CurrentSamplerate / 2);
                 }
                 if (SET_MarkerUnit[I] == 1)
                 {
-                    ValF = (SET_MarkerFreq[I] / 10000);
-                    ValS = (SET_MarkerFreq[I] * (Reso_ * SET_SampleDecimation) / 10000);
+                    ValF = SET_MarkerFreq[I] / 10000;
                 }
                 if (SET_MarkerUnit[I] == 2)
                 {
-                    ValF = (SET_MarkerFreq[I] / 8192);
-                    ValS = (SET_MarkerFreq[I] * (Reso_ * SET_SampleDecimation) / 8192);
+                    ValF = SET_MarkerFreq[I] / 8192;
                 }
-                
-            
-                if (Reso_ > Zoom_)
+                if (SET_ScaleSetLog)
                 {
-                    ValS = Math.round(ValS / (Reso_ / Zoom_));
-                    ValS = ValS * (Reso_ / Zoom_);
-                }
-                else
-                {
-                    ValS = Math.round(ValS);
-                }
-                
-
-                MarkerFreqF[MarkerCountF] = ValF;
-                MarkerColorRF[MarkerCountF] = SET_MarkerColorR[I];
-                MarkerColorGF[MarkerCountF] = SET_MarkerColorG[I];
-                MarkerColorBF[MarkerCountF] = SET_MarkerColorB[I];
-                MarkerCountF++;
-                
-                for (var II = MarkerS_1; II <= MarkerS_2; II++)
-                {
-                    var Idx = MarkerCountS;
-                    var IdxMaxI = -1;
-                    var IdxMaxV = -1;
-                    var Freq_ = ValS + (II * MarkerSThickFactor);
-                    for (var III = 0; III < MarkerCountS; III++)
+                    var LogB = Math.log(SET_ScaleSetLogBase / 1000);
+                    var ScaleSetLogFactor_ = (SET_ScaleSetLogFactor * Zoom_) / 1000;
+                    var ScaleSetLogOffset_ = (SET_ScaleSetLogOffset * Zoom_) / 1000;
+                    if ((LogB == 0) || (ValF <= 0))
                     {
-                        if (MarkerFreqS[III] == Freq_)
-                        {
-                            Idx = III;
-                            break;
-                        }
-                        if ((IdxMaxV < MarkerFreqS[III]) && (MarkerFreqS[III] < Freq_))
-                        {
-                            IdxMaxV = MarkerFreqS[III];
-                            IdxMaxI = III;
-                        }
-                    }
-                    
-                    if (Idx == MarkerCountS)
-                    {
-                        if (IdxMaxI >= 0)
-                        {
-                            Idx = IdxMaxI + 1;
-                        }
-                        else
-                        {
-                            if (MarkerCountS > 0)
-                            {
-                                if (MarkerFreqS[0] > Freq_)
-                                {
-                                    Idx = 0;
-                                }
-                            }
-                        }
-                        
-                        for (var III = (MarkerCountS - 1); III >= Idx; III--)
-                        {
-                            MarkerFreqS[III + 1] = MarkerFreqS[III];
-                            MarkerColorRS[III + 1] = MarkerColorRS[III];
-                            MarkerColorGS[III + 1] = MarkerColorGS[III];
-                            MarkerColorBS[III + 1] = MarkerColorBS[III];
-                        }
-                        MarkerFreqS[Idx] = Freq_;
-                        MarkerColorRS[Idx] = SET_MarkerColorR[I];
-                        MarkerColorGS[Idx] = SET_MarkerColorG[I];
-                        MarkerColorBS[Idx] = SET_MarkerColorB[I];
-                        MarkerCountS++;
+                        ValF = Number.NaN;
                     }
                     else
                     {
-                        MarkerColorRS[Idx] = SET_MarkerColorR[I];
-                        MarkerColorGS[Idx] = SET_MarkerColorG[I];
-                        MarkerColorBS[Idx] = SET_MarkerColorB[I];
+                        var Val = ((Math.log(ValF * SET_SampleDecimation) / LogB) * ScaleSetLogFactor_) + ScaleSetLogOffset_;
+                        ValF = Val / (Zoom_ * SET_SampleDecimation);
                     }
                 }
+                if ((ValF < 0) || (ValF > 1))
+                {
+                    ValF = Number.NaN;
+                }
+                if (!isNaN(ValF))
+                {
+                    ValS = ValF * (Reso_ * SET_SampleDecimation);
                 
+                    if (Reso_ > Zoom_)
+                    {
+                        ValS = Math.round(ValS / (Reso_ / Zoom_));
+                        ValS = ValS * (Reso_ / Zoom_);
+                    }
+                    else
+                    {
+                        ValS = Math.round(ValS);
+                    }
+                    
+
+                    MarkerFreqF[MarkerCountF] = ValF;
+                    MarkerColorRF[MarkerCountF] = SET_MarkerColorR[I];
+                    MarkerColorGF[MarkerCountF] = SET_MarkerColorG[I];
+                    MarkerColorBF[MarkerCountF] = SET_MarkerColorB[I];
+                    MarkerCountF++;
+                    
+                    for (var II = MarkerS_1; II <= MarkerS_2; II++)
+                    {
+                        var Idx = MarkerCountS;
+                        var IdxMaxI = -1;
+                        var IdxMaxV = -1;
+                        var Freq_ = ValS + (II * MarkerSThickFactor);
+                        for (var III = 0; III < MarkerCountS; III++)
+                        {
+                            if (MarkerFreqS[III] == Freq_)
+                            {
+                                Idx = III;
+                                break;
+                            }
+                            if ((IdxMaxV < MarkerFreqS[III]) && (MarkerFreqS[III] < Freq_))
+                            {
+                                IdxMaxV = MarkerFreqS[III];
+                                IdxMaxI = III;
+                            }
+                        }
+                        
+                        if (Idx == MarkerCountS)
+                        {
+                            if (IdxMaxI >= 0)
+                            {
+                                Idx = IdxMaxI + 1;
+                            }
+                            else
+                            {
+                                if (MarkerCountS > 0)
+                                {
+                                    if (MarkerFreqS[0] > Freq_)
+                                    {
+                                        Idx = 0;
+                                    }
+                                }
+                            }
+                            
+                            for (var III = (MarkerCountS - 1); III >= Idx; III--)
+                            {
+                                MarkerFreqS[III + 1] = MarkerFreqS[III];
+                                MarkerColorRS[III + 1] = MarkerColorRS[III];
+                                MarkerColorGS[III + 1] = MarkerColorGS[III];
+                                MarkerColorBS[III + 1] = MarkerColorBS[III];
+                            }
+                            MarkerFreqS[Idx] = Freq_;
+                            MarkerColorRS[Idx] = SET_MarkerColorR[I];
+                            MarkerColorGS[Idx] = SET_MarkerColorG[I];
+                            MarkerColorBS[Idx] = SET_MarkerColorB[I];
+                            MarkerCountS++;
+                        }
+                        else
+                        {
+                            MarkerColorRS[Idx] = SET_MarkerColorR[I];
+                            MarkerColorGS[Idx] = SET_MarkerColorG[I];
+                            MarkerColorBS[Idx] = SET_MarkerColorB[I];
+                        }
+                    }
+                }
             }
         }
     }

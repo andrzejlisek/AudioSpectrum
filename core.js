@@ -9,13 +9,12 @@ var SET_CanvasScaleH = DataGetIDefault("SET_CanvasScaleH", 1);
 var SET_CanvasScaleV = DataGetIDefault("SET_CanvasScaleV", 1);
 var SET_MinimumStep = DataGetIDefault("SET_MinimumStep", 6);
 var SET_MaximumResolution = DataGetIDefault("SET_MaximumResolution", 9);
+var SET_MinimumStepScroll = DataGetIDefault("SET_MinimumStepScroll", 8);
 var SET_FFTWindow = DataGetIDefault("SET_FFTWindow", 3);
 var SET_DrawGamma = DataGetIDefault("SET_DrawGamma", 2200);
 var SET_ToolbarSize = DataGetIDefault("SET_ToolbarSize", 20);
-var SET_ToolbarPosition = DataGetIDefault("SET_ToolbarPosition", 0);
+var SET_ToolbarPosition = DataGetIDefault("SET_ToolbarPosition", 3);
 var SET_DrawStripSize = DataGetIDefault("SET_DrawStripSize", 8);
-var SET_DrawLogBase = DataGetIDefault("SET_DrawLogBase", 0);
-var SET_DrawLogFactor = DataGetIDefault("SET_DrawLogFactor", 1000);
 
 var SET_DrawStripColorR = DataGetIDefault("SET_DrawStripColorR", 255);
 var SET_DrawStripColorG = DataGetIDefault("SET_DrawStripColorG", 255);
@@ -43,9 +42,6 @@ var SET_AudioGainB = DataGetIDefault("SET_AudioGainB", 1000);
 var SET_AudioBufferLength = DataGetIDefault("SET_AudioBufferLength", 12);
 var SET_BufLength = DataGetIDefault("SET_BufLength", 10000000);
 var SET_BufTick = DataGetIDefault("SET_BufTick", 50);
-
-var SET_DispModeLines = DataGetIDefault("SET_DispModeLines", 2);
-var SET_DispModeWaveform = DataGetIDefault("SET_DispModeWaveform", 3);
 
 var SET_WaveformBack = DataGetIDefault("SET_WaveformBack", 32);
 var SET_WaveformFore = DataGetIDefault("SET_WaveformFore", 256);
@@ -341,8 +337,10 @@ function AudioCallback(raw)
 
     if (WORK_Spectrum && (WaveDisplayCanvasWX > 0) && (WaveDisplayCanvasH > 0))
     {
+        var DISP_Mode_ = (DISP_Mode < 2) ? DISP_Mode : 0;
+    
         var datacount = raw[1];
-        var CanvasLineY = CanvasLine * CanvasLineNum * (DISP_Mode + 1);
+        var CanvasLineY = CanvasLine * CanvasLineNum * (DISP_Mode_ + 1);
         var DrawPointerX = 0;
 
         var CanvasHalf = Math.floor(WaveDisplayCanvasWX / 2);
@@ -354,7 +352,7 @@ function AudioCallback(raw)
         var Position = 0;
         var DrawPointer0;
         var CanvasLineY0;
-        var DISP_ModeX = DISP_Mode + 1;
+        var DISP_ModeX = DISP_Mode_ + 1;
 
         var DataR;
         var DataG;
@@ -374,6 +372,9 @@ function AudioCallback(raw)
         var DatumB;
 
         var MemFreeIdx = 1;
+        var ScaleDataI;
+        var ScaleDataT;
+        var ScaleDataL_;
 
         for (var ii = 0; ii < datacount; ii++)
         {
@@ -386,13 +387,24 @@ function AudioCallback(raw)
             CanvasLineY0 = CanvasLineY;
             if (Position > 0)
             {
-                while (DrawPointer0 < 0)
+                if (DISP_Mode < 2)
                 {
-                    DrawPointer0 += WaveDisplayCanvasWX + 1;
-                    CanvasLineY0 -= CanvasLine * DISP_ModeX;
-                    if (CanvasLineY0 < 0)
+                    while (DrawPointer0 < 0)
                     {
-                        CanvasLineY0 += CanvasLine * DISP_Line * DISP_ModeX;
+                        DrawPointer0 += WaveDisplayCanvasWX + 1;
+                        CanvasLineY0 -= CanvasLine * DISP_ModeX;
+                        if (CanvasLineY0 < 0)
+                        {
+                            CanvasLineY0 += CanvasLine * DISP_Line * DISP_ModeX;
+                        }
+                    }
+                }
+                else
+                {
+                    while (DrawPointer0 < 0)
+                    {
+                        DrawPointer0 += WaveDisplayCanvasWX - 1;
+                        CanvasLineY0 -= CanvasLine * DISP_ModeX;
                     }
                 }
             }
@@ -420,7 +432,7 @@ function AudioCallback(raw)
             DataB = raw[ii * OneIndex + 3 + SET_AudioModeB];
             Len_ = DataR.length - 1;
             Len = Math.floor(Len_ / 2);
-
+            ScaleCalc(Len);
 
             Zoom1 = Math.floor(Zoom_ / Len);
             Zoom2 = Math.floor(Len / Zoom_);
@@ -435,62 +447,102 @@ function AudioCallback(raw)
             }
 
             LenO = DISP_Offs * Len / 64;
-            I_M_Start = 0;
-            for (var i = 0; i < CanvasLine; i++)
+            if (SET_FlipBand)
             {
-                if (SET_FlipBand)
-                {
-                    I_ = Math.floor((((CanvasLine - i - 1) * Zoom2) / Zoom1) + LenO);
-                }
-                else
-                {
-                    I_ = Math.floor(((i * Zoom2) / Zoom1) + LenO);
-                }
-                DatumR = 0;
-                DatumG = 0;
-                DatumB = 0;
-                if ((I_ >= 0) && (I_ < Len))
-                {
-                    DatumR = Math.round(DataR[I_] * AudioGainR);
-                    DatumG = Math.round(DataG[I_] * AudioGainG);
-                    DatumB = Math.round(DataB[I_] * AudioGainB);
-                    IsOverdrive = IsOverdrive_;
-                }
-                else
-                {
-                    IsOverdrive = false;
-                }
+                I_M_Start = MarkerCountS - 1;
+            }
+            else
+            {
+                I_M_Start = 0;
+            }
 
-                if (IsOverdrive)
+            if (CanvasLineY0 >= 0)
+            {
+                for (var i = 0; i < CanvasLine; i++)
                 {
-                    WaveDisplayCanvasDataR = ((SET_DrawOverdriveColorR * SET_DrawOverdriveColorA) + (DrawPaletteR[DatumR] * SET_DrawOverdriveColorX)) / 255;
-                    WaveDisplayCanvasDataG = ((SET_DrawOverdriveColorG * SET_DrawOverdriveColorA) + (DrawPaletteG[DatumG] * SET_DrawOverdriveColorX)) / 255;
-                    WaveDisplayCanvasDataB = ((SET_DrawOverdriveColorB * SET_DrawOverdriveColorA) + (DrawPaletteB[DatumB] * SET_DrawOverdriveColorX)) / 255;
-                }
-                else
-                {
-                    WaveDisplayCanvasDataR = DrawPaletteR[DatumR];
-                    WaveDisplayCanvasDataG = DrawPaletteG[DatumG];
-                    WaveDisplayCanvasDataB = DrawPaletteB[DatumB];
-                }
-                if (DISP_VU__ == 0)
-                {
-                    for (I_M = I_M_Start; I_M < MarkerCountS; I_M++)
+                    if (SET_FlipBand)
                     {
-                        if (I_ == MarkerFreqS[I_M])
+                        I_ = Math.floor((((CanvasLine - i - 1) * Zoom2) / Zoom1) + LenO);
+                    }
+                    else
+                    {
+                        I_ = Math.floor(((i * Zoom2) / Zoom1) + LenO);
+                    }
+                    DatumR = 0;
+                    DatumG = 0;
+                    DatumB = 0;
+                    if ((I_ >= 0) && (I_ < Len))
+                    {
+                        if (ScaleDataL[I_] > 0)
                         {
-                            WaveDisplayCanvasDataR = MarkerColorRS[I_M];
-                            WaveDisplayCanvasDataG = MarkerColorGS[I_M];
-                            WaveDisplayCanvasDataB = MarkerColorBS[I_M];
-                            I_M_Start = I_M;
-                            break;
+                            ScaleDataL_ = ScaleDataL[I_];
+                            ScaleDataT = ScaleData[I_];
+                            for (ScaleDataI = ScaleDataL_ - 1; ScaleDataI >= 0; ScaleDataI--)
+                            {
+                                DatumR += (DataR[ScaleDataT[ScaleDataI]] * AudioGainR);
+                                DatumG += (DataG[ScaleDataT[ScaleDataI]] * AudioGainG);
+                                DatumB += (DataB[ScaleDataT[ScaleDataI]] * AudioGainB);
+                            }
+                            DatumR = Math.round(DatumR / ScaleDataL_);
+                            DatumG = Math.round(DatumG / ScaleDataL_);
+                            DatumB = Math.round(DatumB / ScaleDataL_);
+                        }
+                        IsOverdrive = IsOverdrive_;
+                    }
+                    else
+                    {
+                        IsOverdrive = false;
+                    }
+
+                    if (IsOverdrive)
+                    {
+                        WaveDisplayCanvasDataR = ((SET_DrawOverdriveColorR * SET_DrawOverdriveColorA) + (DrawPaletteR[DatumR] * SET_DrawOverdriveColorX)) / 255;
+                        WaveDisplayCanvasDataG = ((SET_DrawOverdriveColorG * SET_DrawOverdriveColorA) + (DrawPaletteG[DatumG] * SET_DrawOverdriveColorX)) / 255;
+                        WaveDisplayCanvasDataB = ((SET_DrawOverdriveColorB * SET_DrawOverdriveColorA) + (DrawPaletteB[DatumB] * SET_DrawOverdriveColorX)) / 255;
+                    }
+                    else
+                    {
+                        WaveDisplayCanvasDataR = DrawPaletteR[DatumR];
+                        WaveDisplayCanvasDataG = DrawPaletteG[DatumG];
+                        WaveDisplayCanvasDataB = DrawPaletteB[DatumB];
+                    }
+                    if (DISP_VU__ == 0)
+                    {
+                        if (SET_FlipBand)
+                        {
+                            for (I_M = I_M_Start; I_M >= 0; I_M--)
+                            {
+                                if (I_ == MarkerFreqS[I_M])
+                                {
+                                    WaveDisplayCanvasDataR = MarkerColorRS[I_M];
+                                    WaveDisplayCanvasDataG = MarkerColorGS[I_M];
+                                    WaveDisplayCanvasDataB = MarkerColorBS[I_M];
+                                    I_M_Start = I_M;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (I_M = I_M_Start; I_M < MarkerCountS; I_M++)
+                            {
+                                if (I_ == MarkerFreqS[I_M])
+                                {
+                                    WaveDisplayCanvasDataR = MarkerColorRS[I_M];
+                                    WaveDisplayCanvasDataG = MarkerColorGS[I_M];
+                                    WaveDisplayCanvasDataB = MarkerColorBS[I_M];
+                                    I_M_Start = I_M;
+                                    break;
+                                }
+                            }
                         }
                     }
-                }
-                DrawRectX(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointer0 << CanvasDrawStepX, CanvasLineY0 + CanvasLine - i - 1, CanvasDrawStep, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
-                if (DISP_Mode == 1)
-                {
-                    DrawRectX(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointerX << CanvasDrawStepX, CanvasLineY0 + CanvasLine + CanvasHalfY - i - 1, CanvasDrawStep, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
+
+                    DrawRectX(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointer0 << CanvasDrawStepX, CanvasLineY0 + CanvasLine - i - 1, CanvasDrawStep, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
+                    if (DISP_Mode == 1)
+                    {
+                        DrawRectX(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointerX << CanvasDrawStepX, CanvasLineY0 + CanvasLine + CanvasHalfY - i - 1, CanvasDrawStep, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
+                    }
                 }
             }
             if (SET_AudioPlayerDrawBuf)
@@ -525,20 +577,56 @@ function AudioCallback(raw)
                 MemFreeIdx++
             }
 
-            if (Position == 0)
+
+            if (DISP_Mode == 2)
             {
-                DrawPointer++;
-                if (DrawPointer > (WaveDisplayCanvasWX))
+                CanvasLineNum = DISP_Line - 1;
+                var CanW = (WaveDisplayCanvasW >> CanvasDrawStepX);
+                
+                if (Position == 0)
                 {
-                    DrawPointer = 0;
-                    CanvasLineNum++;
-                    if (CanvasLineNum >= DISP_Line)
+                    DrawPointer = (WaveDisplayCanvasW - SET_DrawStripSize);
+                    DrawPointer = (DrawPointer >> CanvasDrawStepX) - 1;
+
+                    
+                    DrawCopy(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, CanvasDrawStep, 0, 0, 0, WaveDisplayCanvasW - CanvasDrawStep, WaveDisplayCanvasH);
+                    if (CanvasDrawStep > 1)
                     {
-                        CanvasLineNum = 0;
+                        DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, CanW << CanvasDrawStepX, 0, CanvasDrawStep, WaveDisplayCanvasH, 0, 0, 0);
                     }
-                    CanvasLineY = CanvasLine * CanvasLineNum * (DISP_Mode + 1);
+
                 }
 
+                if ((Position == 0) || (DrawPointer0 < DISP_Line))
+                {
+                    if (CanvasLineNum > 0)
+                    {
+                        var DrawPos = (WaveDisplayCanvasW >> CanvasDrawStepX) - 1;
+                        DrawCopy(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, 0, CanvasLine, DrawPos << CanvasDrawStepX, 0, CanvasDrawStep, CanvasLine * CanvasLineNum);
+                    }
+                }
+                
+
+
+                CanvasLineY = CanvasLine * CanvasLineNum;
+            }
+
+            if (Position == 0)
+            {
+                if (DISP_Mode < 2)
+                {
+                    DrawPointer++;
+                    if (DrawPointer > (WaveDisplayCanvasWX))
+                    {
+                        DrawPointer = 0;
+                        CanvasLineNum++;
+                        if (CanvasLineNum >= DISP_Line)
+                        {
+                            CanvasLineNum = 0;
+                        }
+                        CanvasLineY = CanvasLine * CanvasLineNum * (DISP_Mode_ + 1);
+                    }
+                }
 
                 if (DISP_Mode == 1)
                 {
@@ -590,9 +678,19 @@ function AudioCallback(raw)
         {
             var CanvasLineY0 = CanvasLineY;
             var CanvasLineH0 = CanvasLine;
+            var CanvasLineOffset = 0;
             WaveDisplayCanvasDataR = DrawPaletteR[0];
             WaveDisplayCanvasDataG = DrawPaletteG[0];
             WaveDisplayCanvasDataB = DrawPaletteB[0];
+            
+            var DrawPointerOffset = 0;
+            
+            if (DISP_Mode == 2)
+            {
+                DrawPointerOffset = 1;
+            }
+            DrawPointer += DrawPointerOffset;
+            
             DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointer << CanvasDrawStepX, CanvasLineY0, SET_DrawStripSize, CanvasLineH0, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
             if (DISP_Mode == 1)
             {
@@ -612,11 +710,19 @@ function AudioCallback(raw)
 
             if (CanvasLine > OffsetX)
             {
-                CanvasLineH0 = (Zoom_ > OffsetX) ? OffsetX : Zoom_;
+                if (Zoom_ > OffsetX)
+                {
+                    CanvasLineH0 = OffsetX;
+                }
+                else
+                {
+                    CanvasLineH0 = Zoom_;
+                }
                 CanvasLineY0 = CanvasLineY + CanvasLine - OffsetX;
             }
             else
             {
+                CanvasLineOffset = OffsetX - CanvasLine;
                 if (SET_FlipBand)
                 {
                     if (OffsetX > Zoom_)
@@ -632,14 +738,22 @@ function AudioCallback(raw)
                     }
                 }
             }
-            WaveDisplayCanvasDataR = SET_DrawStripColorR;
-            WaveDisplayCanvasDataG = SET_DrawStripColorG;
-            WaveDisplayCanvasDataB = SET_DrawStripColorB;
-            DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointer << CanvasDrawStepX, CanvasLineY0, SET_DrawStripSize, CanvasLineH0, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
-            if (DISP_Mode == 1)
+            
+            ScaleCalcStrip(Zoom_, CanvasLineH0, CanvasLineOffset);
+            for (var i = 0; i < ScaleStripColor.length; i++)
             {
-                DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointerX << CanvasDrawStepX, CanvasLineY0 + CanvasHalfY, SET_DrawStripSize, CanvasLineH0, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
+                var Y__ = CanvasLineY0 + ScaleStripColor[i][0];
+                var H__ = ScaleStripColor[i][1];
+
+                DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointer << CanvasDrawStepX, Y__, SET_DrawStripSize, H__, ScaleStripColor[i][2], ScaleStripColor[i][3], ScaleStripColor[i][4]);
+                if (DISP_Mode == 1)
+                {
+                    DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointerX << CanvasDrawStepX, Y__ + CanvasHalfY, SET_DrawStripSize, H__, ScaleStripColor[i][2], ScaleStripColor[i][3], ScaleStripColor[i][4]);
+                }
+
             }
+            
+            DrawPointer -= DrawPointerOffset;
         }
 
         DrawRefresh(WaveDisplayCanvasContext, WaveDisplayCanvasData);
@@ -821,7 +935,7 @@ function SpectrogramSetLayout()
         Tools[i].style["font-size"] = SET_ButtonFontSize + "pt";
     }
 
-
+    ScaleSetToolbar();
 
     var ToolbarH1 = document.getElementById("AppSpectrogramToolbarH1");
     var ToolbarV1 = document.getElementById("AppSpectrogramToolbarV1");
@@ -924,6 +1038,7 @@ function SpectrogramSetLayout()
     WaveDisplayCanvasObject.style["width"] = Math.floor(WaveDisplayCanvasW * SET_CanvasScaleH) + "px";
     WaveDisplayCanvasObject.style["height"] = Math.floor(WaveDisplayCanvasH * SET_CanvasScaleV) + "px";
     WaveDisplayCanvasData = WaveDisplayCanvasContext.createImageData(WaveDisplayCanvasW, WaveDisplayCanvasH);
+    DrawClear(WaveDisplayCanvasData, WaveDisplayCanvasW, WaveDisplayCanvasH);
 
     WaveDisplayCanvasW_ = WaveDisplayCanvasW;
     WaveDisplayCanvasH_ = WaveDisplayCanvasH;
@@ -935,7 +1050,7 @@ function SpectrogramSetLayout()
         WaveDisplayCanvasH = CanvasLine;
     }
 
-    if (DISP_Mode == 0)
+    if ((DISP_Mode == 0) || (DISP_Mode == 2))
     {
         CanvasLine = Math.floor(WaveDisplayCanvasH / DISP_Line);
     }
@@ -995,30 +1110,6 @@ if (DataExists("DISP_Line")) { DISP_Line = parseInt(DataGet("DISP_Line")); }
 if (DataExists("DISP_Mode")) { DISP_Mode = parseInt(DataGet("DISP_Mode")); }
 if (DataExists("DISP_VU__")) { DISP_VU__ = parseInt(DataGet("DISP_VU__")); }
 
-
-function DispBaseLimit()
-{
-    DISP_Base = (SET_DrawLogBase > 1) ? Limit(DISP_Base, 0, 100) : Limit(DISP_Base, -128, 64);
-    var _Base = (DISP_Base * SET_DrawLogFactor / 1000);
-    _Base = (Math.round(_Base * 100) / 100);
-    var DISP_Base_ = ((SET_DrawLogBase > 1) ? LabelVal(DISP_Base * SET_DrawLogFactor, 3) : (DISP_Base + "/64"));
-
-    if (document.getElementById("BtnH1BaseUp"))
-    {
-        document.getElementById("BtnH1BaseUp").innerText = "B+\n" + DISP_Base_;
-        document.getElementById("BtnV1BaseUp").innerText = "B+\n" + DISP_Base_;
-        document.getElementById("BtnH2BaseUp").innerText = "B+\n" + DISP_Base_;
-        document.getElementById("BtnV2BaseUp").innerText = "B+\n" + DISP_Base_;
-
-        document.getElementById("BtnH1BaseDn").innerText = "B-\n" + DISP_Base_;
-        document.getElementById("BtnV1BaseDn").innerText = "B-\n" + DISP_Base_;
-        document.getElementById("BtnH2BaseDn").innerText = "B-\n" + DISP_Base_;
-        document.getElementById("BtnV2BaseDn").innerText = "B-\n" + DISP_Base_;
-    }
-}
-
-DispBaseLimit();
-
 function SetLabels()
 {
     var DISP_Gain_ = Math.pow(2, DISP_Gain);
@@ -1055,11 +1146,19 @@ function SetLabels()
     var DISP_Zoom_ = Math.pow(2, DISP_Zoom + 9);
     var DISP_Offs_ = DISP_Offs + "/64";
     var DISP_Step_ = Math.pow(2, DISP_Step);
-    var _Base = (DISP_Base * SET_DrawLogFactor / 1000);
-    _Base = (Math.round(_Base * 100) / 100);
-    var DISP_Base_ = ((SET_DrawLogBase > 1) ? LabelVal(DISP_Base * SET_DrawLogFactor, 3) : (DISP_Base + "/64"));
+    var DISP_Base_ = DISP_Base + "/64";
     var DISP_MiMa_ = DISP_MiMa;
     var DISP_Line_ = DISP_Line;
+    
+    var LabelDisp = "Disp\n";
+    if (DISP_Mode == 0) { LabelDisp += "Normal\n"; }
+    if (DISP_Mode == 1) { LabelDisp += "Half\n"; }
+    if (DISP_Mode == 2) { LabelDisp += "Scroll\n"; }
+    if (DISP_VU__ == 0) { LabelDisp += "Spec"; }
+    if (DISP_VU__ == 1) { LabelDisp += "Wave"; }
+    if (DISP_VU__ == 2) { LabelDisp += "Vol"; }
+    
+    var LabelPause = (IsPaused ? "Resume" : "Pause");
 
     document.getElementById("BtnH1GainUp").innerText = "G+\n" + DISP_Gain_;
     document.getElementById("BtnV1GainUp").innerText = "G+\n" + DISP_Gain_;
@@ -1150,6 +1249,16 @@ function SetLabels()
     document.getElementById("BtnV1LineDn").innerText = "L-\n" + DISP_Line_;
     document.getElementById("BtnH2LineDn").innerText = "L-\n" + DISP_Line_;
     document.getElementById("BtnV2LineDn").innerText = "L-\n" + DISP_Line_;
+
+    document.getElementById("BtnH1Mode__").innerText = LabelDisp;
+    document.getElementById("BtnV1Mode__").innerText = LabelDisp;
+    document.getElementById("BtnH2Mode__").innerText = LabelDisp;
+    document.getElementById("BtnV2Mode__").innerText = LabelDisp;
+
+    document.getElementById("BtnH1Paus__").innerText = LabelPause;
+    document.getElementById("BtnV1Paus__").innerText = LabelPause;
+    document.getElementById("BtnH2Paus__").innerText = LabelPause;
+    document.getElementById("BtnV2Paus__").innerText = LabelPause;
 }
 
 function FFTWindow(X)
@@ -1197,6 +1306,13 @@ function SetFFT()
     var Win_ = FFTWindow(DISP_Wind);
 
     var RealMinimumStep = Math.max(3, SET_MinimumStep - SET_MaximumResolution + DISP_Reso + 5);
+    if (DISP_Mode == 2)
+    {
+        if (RealMinimumStep < SET_MinimumStepScroll)
+        {
+            RealMinimumStep = SET_MinimumStepScroll;
+        }
+    }
 
     var Step_ = Math.pow(2, Math.max(DISP_Step, RealMinimumStep));
     var Base_ = DISP_Base;
@@ -1246,7 +1362,7 @@ function SetFFT()
     }
     MarkerCalc();
 
-    audioRecorder.Msg({ command: 'fft', WORK_Spectrum: WORK_Spectrum, DispMode: DISP_VU__, FFT: FFT_, Win: Win_, FFTWin: SET_FFTWindow, FFTDecimation: FFTDecimation, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: AudioModeVal, DispSize: (DISP_Line * WaveDisplayCanvasWX) - Math.ceil(SET_DrawStripSize / CanvasDrawStep) + 1, BufTick: Math.ceil(SET_BufTick / CanvasDrawStep), LogBase: SET_DrawLogBase, LogFactor: SET_DrawLogFactor / 1000, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
+    audioRecorder.Msg({ command: 'fft', WORK_Spectrum: WORK_Spectrum, DispMode: DISP_VU__, FFT: FFT_, Win: Win_, FFTWin: SET_FFTWindow, FFTDecimation: FFTDecimation, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: AudioModeVal, DispSize: (DISP_Line * WaveDisplayCanvasWX) - Math.ceil(SET_DrawStripSize / CanvasDrawStep) + 1, BufTick: Math.ceil(SET_BufTick / CanvasDrawStep), Log: SET_DrawLog, LogBase: SET_DrawLogBase / 1000, LogFactor: SET_DrawLogFactor / 1000, LogOffset: SET_DrawLogOffset / 1000, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
 }
 
 function SetScope()
@@ -1340,11 +1456,11 @@ function BtnAction(Btn)
             SetFFT();
             break;
         case 22:
-            DISP_Base = (SET_DrawLogBase > 1) ? Limit(DISP_Base - 1, 0, 100) : Limit(DISP_Base - 1, -128, 64);
+            DISP_Base = Limit(DISP_Base - 1, -128, 64);
             SetFFT();
             break;
         case 23:
-            DISP_Base = (SET_DrawLogBase > 1) ? Limit(DISP_Base + 1, 0, 100) : Limit(DISP_Base + 1, -128, 64);
+            DISP_Base = Limit(DISP_Base + 1, -128, 64);
             SetFFT();
             break;
         case 24:
@@ -1357,57 +1473,74 @@ function BtnAction(Btn)
             break;
         case 26:
             DISP_Line = Limit(DISP_Line - 1, 1, 32);
-            CanvasLineNum = 0;
+            if (DISP_Mode < 2)
+            {
+                CanvasLineNum = 0;
+            }
+            else
+            {
+                CanvasLineNum = DISP_Line - 1;
+            }
             SetLayout();
             break;
         case 27:
             DISP_Line = Limit(DISP_Line + 1, 1, 32);
-            CanvasLineNum = 0;
+            if (DISP_Mode < 2)
+            {
+                CanvasLineNum = 0;
+            }
+            else
+            {
+                CanvasLineNum = DISP_Line - 1;
+            }
             SetLayout();
             break;
         case 28:
             Temp = false;
-            switch (SET_DispModeLines)
+            if (DISP_Mode < 2)
             {
-                case 0: DISP_Mode = 0; Temp = true; break;
-                case 1: DISP_Mode = 1; Temp = true; break;
-                case 2:
-                    if (DISP_Mode == 0)
-                    {
-                        DISP_Mode = 1;
-                    }
-                    else
-                    {
-                        DISP_Mode = 0;
-                        Temp = true;
-                    }
-                break;
+                DISP_Mode++;
+            }
+            else
+            {
+                DISP_Mode = 0;
+                Temp = true;
+            }
+            if (DISP_Mode == 2)
+            {
+                CanvasLineNum = DISP_Line - 1;
+            }
+            else
+            {
+                CanvasLineNum = 0;
             }
             if (Temp)
             {
                 DISP_VU__++;
-                if ((SET_DispModeWaveform == 0))
-                {
-                    DISP_VU__ = 0;
-                }
-                if ((SET_DispModeWaveform == 1) && (DISP_VU__ == 2))
-                {
-                    DISP_VU__++;
-                }
-                if ((SET_DispModeWaveform == 2) && (DISP_VU__ == 1))
-                {
-                    DISP_VU__++;
-                }
                 if (DISP_VU__ == 3)
                 {
                     DISP_VU__ = 0;
                 }
+                ScaleCalcReset();
+                ScaleCalcStripReset();
             }
             SetFFT();
             SetLayout();
             break;
         case 29:
             Pause();
+            break;
+        case 30:
+        case 31:
+        case 32:
+        case 33:
+        case 34:
+        case 35:
+        case 36:
+        case 37:
+        case 38:
+        case 39:
+            ScaleBtnAction(Btn);
             break;
     }
     DataSet("DISP_Gain", DISP_Gain);
@@ -1443,16 +1576,17 @@ function SettingsShow()
 
     document.getElementById("xSET_DrawOrientation").selectedIndex = SET_DrawOrientation;
     document.getElementById("xSET_FlipBand").selectedIndex = SET_FlipBand ? 1 : 0;
+    document.getElementById("xSET_ScaleSetLogQuality").selectedIndex = SET_ScaleSetLogQuality;
     document.getElementById("xSET_ToolbarPosition").selectedIndex = SET_ToolbarPosition;
+    document.getElementById("xSET_ToolbarLog").selectedIndex = SET_ToolbarLog ? 1 : 0;
     document.getElementById("xSET_ToolbarSize").value = SET_ToolbarSize;
     document.getElementById("xSET_MinimumStep").selectedIndex = SET_MinimumStep - 3;
     document.getElementById("xSET_MaximumResolution").selectedIndex = SET_MaximumResolution - 5;
+    document.getElementById("xSET_MinimumStepScroll").selectedIndex = SET_MinimumStepScroll - 3;
     document.getElementById("xSET_FFTWindow").selectedIndex = SET_FFTWindow;
     document.getElementById("xSET_CanvasScaleH").value = SET_CanvasScaleH;
     document.getElementById("xSET_CanvasScaleV").value = SET_CanvasScaleV;
     document.getElementById("xSET_DrawGamma").value = SET_DrawGamma;
-    document.getElementById("xSET_DrawLogBase").value = SET_DrawLogBase;
-    document.getElementById("xSET_DrawLogFactor").value = SET_DrawLogFactor;
 
     document.getElementById("xSET_BufLength").value = SET_BufLength;
     document.getElementById("xSET_BufTick").value = SET_BufTick;
@@ -1465,8 +1599,6 @@ function SettingsShow()
     document.getElementById("xSET_DrawOverdriveColor").value = ColorValuesToText(SET_DrawOverdriveColorR, SET_DrawOverdriveColorG, SET_DrawOverdriveColorB);
     document.getElementById("xSET_DrawOverdriveColorA").value = SET_DrawOverdriveColorA;
 
-    document.getElementById("xSET_DispModeLines").selectedIndex = SET_DispModeLines;
-    document.getElementById("xSET_DispModeWaveform").selectedIndex = SET_DispModeWaveform;
     document.getElementById("xSET_WaveformBack").value = SET_WaveformBack;
     document.getElementById("xSET_WaveformFore").value = SET_WaveformFore;
     document.getElementById("xSET_ButtonFontSize").value = SET_ButtonFontSize;
@@ -1514,15 +1646,20 @@ function SettingBtn(Cmd)
         case 3:
             SET_DrawOrientation = document.getElementById("xSET_DrawOrientation").selectedIndex;
             SET_FlipBand = (document.getElementById("xSET_FlipBand").selectedIndex == 1);
+            SET_ScaleSetLogQuality = document.getElementById("xSET_ScaleSetLogQuality").selectedIndex;
             SET_ToolbarPosition = document.getElementById("xSET_ToolbarPosition").selectedIndex;
+            SET_ToolbarLog = (document.getElementById("xSET_ToolbarLog").selectedIndex == 1);
             SET_ToolbarSize = Limit(document.getElementById("xSET_ToolbarSize").value, 1, 1000);
             SET_CanvasScaleH = Limit(document.getElementById("xSET_CanvasScaleH").value, 1, 100);
             SET_CanvasScaleV = Limit(document.getElementById("xSET_CanvasScaleV").value, 1, 100);
             SET_ButtonFontSize = Limit(document.getElementById("xSET_ButtonFontSize").value, 1, 100);
+            ScaleCalcReset();
 
             DataSet("SET_DrawOrientation", SET_DrawOrientation);
             DataSetB("SET_FlipBand", SET_FlipBand);
+            DataSet("SET_ScaleSetLogQuality", SET_ScaleSetLogQuality);
             DataSet("SET_ToolbarPosition", SET_ToolbarPosition);
+            DataSetB("SET_ToolbarLog", SET_ToolbarLog);
             DataSet("SET_ToolbarSize", SET_ToolbarSize);
             DataSet("SET_CanvasScaleH", SET_CanvasScaleH);
             DataSet("SET_CanvasScaleV", SET_CanvasScaleV);
@@ -1536,13 +1673,11 @@ function SettingBtn(Cmd)
             SetLayout();
             break;
         case 4:
-            SET_DrawLogBase = Limit(document.getElementById("xSET_DrawLogBase").value, 0, 1000);
-            SET_DrawLogFactor = Limit(document.getElementById("xSET_DrawLogFactor").value, 1, 1000000);
-            DispBaseLimit();
             SET_SampleDecimation = Limit(document.getElementById("xSET_SampleDecimation").value, 1, 1000);
             MarkerCalc();
             SET_MinimumStep = document.getElementById("xSET_MinimumStep").selectedIndex + 3;
             SET_MaximumResolution = document.getElementById("xSET_MaximumResolution").selectedIndex + 5;
+            SET_MinimumStepScroll = document.getElementById("xSET_MinimumStepScroll").selectedIndex + 3;
             SET_FFTWindow = document.getElementById("xSET_FFTWindow").selectedIndex;
             SET_AudioModeR = document.getElementById("xSET_AudioModeR").selectedIndex;
             SET_AudioGainR = Limit(document.getElementById("xSET_AudioGainR").value, 0, 1000);
@@ -1555,11 +1690,10 @@ function SettingBtn(Cmd)
             SET_WaveformBack = Limit(document.getElementById("xSET_WaveformBack").value, 0, 65536);
             SET_WaveformFore = Limit(document.getElementById("xSET_WaveformFore").value, 0, 65536);
 
-            DataSet("SET_DrawLogBase", SET_DrawLogBase);
-            DataSet("SET_DrawLogFactor", SET_DrawLogFactor);
             DataSet("SET_SampleDecimation", SET_SampleDecimation);
             DataSet("SET_MinimumStep", SET_MinimumStep);
             DataSet("SET_MaximumResolution", SET_MaximumResolution);
+            DataSet("SET_MinimumStepScroll", SET_MinimumStepScroll);
             DataSet("SET_FFTWindow", SET_FFTWindow);
             DataSet("SET_AudioModeR", SET_AudioModeR);
             DataSet("SET_AudioGainR", SET_AudioGainR);
@@ -1611,8 +1745,6 @@ function SettingBtn(Cmd)
             SET_DrawOverdriveColorB = Limit(ColorTemp[2], 0, 255);
             SET_DrawOverdriveColorA = Limit(document.getElementById("xSET_DrawOverdriveColorA").value, 0, 255);
             SET_DrawOverdriveColorX = 255 - SET_DrawOverdriveColorA;
-            SET_DispModeLines = document.getElementById("xSET_DispModeLines").selectedIndex;
-            SET_DispModeWaveform = document.getElementById("xSET_DispModeWaveform").selectedIndex;
             SET_AudioEchoCancellation = (document.getElementById("xSET_AudioEchoCancellation").selectedIndex == 1);
             SET_AudioNoiseSuppression = (document.getElementById("xSET_AudioNoiseSuppression").selectedIndex == 1);
             SET_AudioAutoGainControl_ = (document.getElementById("xSET_AudioAutoGainControl_").selectedIndex == 1);
@@ -1631,8 +1763,6 @@ function SettingBtn(Cmd)
             DataSet("SET_DrawOverdriveColorG", SET_DrawOverdriveColorG);
             DataSet("SET_DrawOverdriveColorB", SET_DrawOverdriveColorB);
             DataSet("SET_DrawOverdriveColorA", SET_DrawOverdriveColorA);
-            DataSet("SET_DispModeLines", SET_DispModeLines);
-            DataSet("SET_DispModeWaveform", SET_DispModeWaveform);
             DataSetB("SET_AudioEchoCancellation", SET_AudioEchoCancellation);
             DataSetB("SET_AudioNoiseSuppression", SET_AudioNoiseSuppression);
             DataSetB("SET_AudioAutoGainControl_", SET_AudioAutoGainControl_);
@@ -1779,12 +1909,11 @@ function SettingsReset(M)
         DataDelete("SET_FFTWindow");
         DataDelete("SET_DrawOrientation");
         DataDelete("SET_FlipBand");
-        DataDelete("SET_DrawLogBase");
-        DataDelete("SET_DrawLogFactor");
         DataDelete("SET_ToolbarPosition");
         DataDelete("SET_ToolbarSize");
         DataDelete("SET_MinimumStep");
         DataDelete("SET_MaximumResolution");
+        DataDelete("SET_MinimumStepScroll");
         DataDelete("SET_CanvasScaleH");
         DataDelete("SET_CanvasScaleV");
         DataDelete("SET_DrawStripSize");
@@ -1797,8 +1926,6 @@ function SettingsReset(M)
         DataDelete("SET_DrawOverdriveColorG");
         DataDelete("SET_DrawOverdriveColorB");
         DataDelete("SET_DrawOverdriveColorA");
-        DataDelete("SET_DispModeLines");
-        DataDelete("SET_DispModeWaveform");
         DataDelete("SET_WaveformBack");
         DataDelete("SET_WaveformFore");
         DataDelete("SET_BufLength");
@@ -1823,6 +1950,19 @@ function SettingsReset(M)
         DataDelete("DISP_VU__");
 
         DataDelete("SET_MarkerSThickness");
+        
+        // scale.js
+        DataDelete("SET_DrawLog");
+        DataDelete("SET_DrawLogBase");
+        DataDelete("SET_DrawLogFactor");
+        DataDelete("SET_DrawLogOffset");
+        DataDelete("SET_ScaleSetLogMode");
+        DataDelete("SET_ScaleSetLog");
+        DataDelete("SET_ScaleSetLogBase");
+        DataDelete("SET_ScaleSetLogFactor");
+        DataDelete("SET_ScaleSetLogOffset");
+        DataDelete("SET_ScaleSetLogStep");
+        DataDelete("SET_ScaleSetLogHiQuality");
     }
 
     // Reset stereo scope
@@ -1933,5 +2073,11 @@ function SettingsReset(M)
             DataDelete("SET_Marker" + I + "Freq");
             DataDelete("SET_Marker" + I + "Unit");
         }
+    }
+    
+    // Clear strip coloring
+    if (M == 10)
+    {
+        ScaleTextClear();
     }
 }

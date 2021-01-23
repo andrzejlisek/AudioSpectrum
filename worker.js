@@ -247,7 +247,9 @@
     var SpectrumBase = 0;
     var SpectrumMinMax = 0;
     var SpectrumMinMaxX = 0;
+    var SpectrumLog = false;    
     var SpectrumLogBase = 0;
+    var SpectrumLogFactor = 0;
     var SpectrumLogOffset = 0;
 
 
@@ -345,8 +347,10 @@
                 SpectrumGain = e.data.Gain;
                 SpectrumBase = e.data.Base / 64.0;
 
+                SpectrumLog = e.data.Log;
                 SpectrumLogBase = e.data.LogBase;
-                SpectrumLogOffset = e.data.Base * e.data.LogFactor;
+                SpectrumLogFactor = e.data.LogFactor;
+                SpectrumLogOffset = e.data.LogOffset;
                 SpectrumMinMax = e.data.MinMax;
                 if (SpectrumMinMax >= 0)
                 {
@@ -634,7 +638,7 @@
         }
         FFT_transform_radix2(FFT_CalcReal, FFT_CalcImag, FFT_FourierBase);
 
-        if (SpectrumLogBase > 1)
+        if (SpectrumLog)
         {
             var LogTemp = Math.log(SpectrumLogBase);
             for (I = 0; I < FFT_FourierBase; I++)
@@ -642,9 +646,17 @@
                 FFT_CalcReal[I] = FFT_CalcReal[I] / FFT_FourierBase;
                 FFT_CalcImag[I] = FFT_CalcImag[I] / FFT_FourierBase;
                 T = Math.sqrt((FFT_CalcReal[I] * FFT_CalcReal[I]) + (FFT_CalcImag[I] * FFT_CalcImag[I])) * SpectrumGain;
+                T = T + SpectrumBase;
                 if (T > 0)
                 {
-                    T = ((Math.log(T) / LogTemp) + SpectrumLogOffset) / SpectrumLogOffset;
+                    if (LogTemp > 0)
+                    {
+                        T = ((Math.log(T) / LogTemp) * SpectrumLogFactor) + SpectrumLogOffset;
+                    }
+                    else
+                    {
+                        T = 0;
+                    }
                 }
 
                 if (T > 1)

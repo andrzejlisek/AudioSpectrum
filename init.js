@@ -34,6 +34,7 @@ SetLayout();
 SetLabels();
 ProcessInit();
 
+ScaleSetToolbar();
 
 var AppStartFunc_ = true;
 if ((SET_AutoStart == 2) || (SET_AutoFullscreen == 2))
@@ -69,6 +70,8 @@ if (SET_AutoFullscreen == 1)
 {
     ToggleFullScreen();
 }
+
+ScaleTextInit();
 
 function KeyPress(e)
 {
