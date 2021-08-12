@@ -598,7 +598,7 @@
                 T = WaveformBack;
             }
 
-            T = T * SpectrumGain
+            T = T * SpectrumGain;
             T = T + SpectrumBase;
             if (T > 1)
             {
@@ -1100,7 +1100,7 @@
                     var ScopeArray_ = new Array(ScopeMaxX);
                     for (var X = 0; X <= ScopeMaxX; X++)
                     {
-                        ScopeArray_[X] = new Array(ScopeMaxY)
+                        ScopeArray_[X] = new Array(ScopeMaxY);
                         for (var Y = 0; Y <= ScopeMaxY; Y++)
                         {
                             var V = Math.round(ScopeArrayI[X][Y] * ScopeGainZ);
@@ -1131,7 +1131,7 @@
                     var ScopeArray_ = new Array(ScopeMaxX);
                     for (var X = 0; X <= ScopeMaxX; X++)
                     {
-                        ScopeArray_[X] = new Array(ScopeMaxY)
+                        ScopeArray_[X] = new Array(ScopeMaxY);
                         for (var Y = 0; Y <= ScopeMaxY; Y++)
                         {
                             var V = Math.round(ScopeArrayO[X][Y] * ScopeGainZ);
@@ -1163,8 +1163,8 @@
                     var ScopeArray_O = new Array(ScopeMaxX);
                     for (var X = 0; X <= ScopeMaxX; X++)
                     {
-                        ScopeArray_I[X] = new Array(ScopeMaxY)
-                        ScopeArray_O[X] = new Array(ScopeMaxY)
+                        ScopeArray_I[X] = new Array(ScopeMaxY);
+                        ScopeArray_O[X] = new Array(ScopeMaxY);
                         for (var Y = 0; Y <= ScopeMaxY; Y++)
                         {
                             var V = Math.round(ScopeArrayI[X][Y] * ScopeGainZ);

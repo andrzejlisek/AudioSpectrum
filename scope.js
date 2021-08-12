@@ -236,7 +236,7 @@ function ScopeBtnAction(N)
 
 var ScopeDrawRect_ = function(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function ScopeDrawRect(X, Y, W, H, ColorR, ColorG, ColorB)
 {
@@ -245,7 +245,7 @@ function ScopeDrawRect(X, Y, W, H, ColorR, ColorG, ColorB)
 
 var ScopeDrawRectX_ = function(CanvasD, CanvasW, CanvasH, X, Y, W, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function ScopeDrawRectX(X, Y, W, ColorR, ColorG, ColorB)
 {
@@ -254,7 +254,7 @@ function ScopeDrawRectX(X, Y, W, ColorR, ColorG, ColorB)
 
 var ScopeDrawRectY_ = function(CanvasD, CanvasW, CanvasH, X, Y, H, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function ScopeDrawRectY(X, Y, H, ColorR, ColorG, ColorB)
 {
@@ -263,7 +263,7 @@ function ScopeDrawRectY(X, Y, H, ColorR, ColorG, ColorB)
 
 var ScopeDrawPxl_ = function(CanvasD, CanvasW, CanvasH, X, Y, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function ScopeDrawPxl(X, Y, ColorR, ColorG, ColorB)
 {

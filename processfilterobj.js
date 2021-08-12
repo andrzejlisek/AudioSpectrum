@@ -43,7 +43,7 @@ var ProcessFilterObj = function()
             this.FilterWindowSize = FilterWindowSize_;
             this.FilterWindowWorkSize = this.FilterWindowSize * 2 + 2;
         }
-    }
+    };
 
     this.Process1 = function()
     {
@@ -76,7 +76,7 @@ var ProcessFilterObj = function()
         this.FilterProcessSmp_ = XXXFil_;
         this.FilterWindowPointer++;
         if (this.FilterWindowPointer >= this.FilterWindowWorkSize) { this.FilterWindowPointer = 0; }
-    }
+    };
 
     this.Process2 = function()
     {
@@ -117,5 +117,5 @@ var ProcessFilterObj = function()
         this.FilterProcessSmpR = XXXFilR;
         this.FilterWindowPointer++;
         if (this.FilterWindowPointer >= this.FilterWindowWorkSize) { this.FilterWindowPointer = 0; }
-    }
-}
+    };
+};

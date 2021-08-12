@@ -167,7 +167,7 @@ var ThrAudioWork = false;
                 ]
             });
             ThrAudioWork = false;
-        }
+        };
 
         this.configure = function(cfg)
         {
@@ -178,47 +178,47 @@ var ThrAudioWork = false;
                     config[prop] = cfg[prop];
                 }
             }
-        }
+        };
 
         this.record = function()
         {
             recording = true;
-        }
+        };
 
         this.stop = function()
         {
             recording = false;
-        }
+        };
 
         this.pause = function(Pause_)
         {
             worker.postMessage({ command: 'pause', Pause: Pause_ });
-        }
+        };
 
         this.datafree = function()
         {
             worker.postMessage({ command: 'free', N: MemFreeIndex });
-        }
+        };
 
         this.clear = function()
         {
             worker.postMessage({ command: 'clear' });
-        }
+        };
 
         this.SetCallback = function(cb)
         {
             currCallback = cb;
-        }
+        };
 
         this.Msg = function(X)
         {
             worker.postMessage(X);
-        }
+        };
 
         this.setstep = function(Step_)
         {
             worker.postMessage({ command: 'step', Step: Step_ });
-        }
+        };
 
         worker.onmessage = function(e)
         {
@@ -230,7 +230,7 @@ var ThrAudioWork = false;
             catch (err)
             {
             }
-        }
+        };
 
         source.connect(this.node);
         this.node.connect(this.context.destination);   // if the script node is not connected to an output the "onaudioprocess" event is not triggered in chrome.
@@ -238,11 +238,11 @@ var ThrAudioWork = false;
 
     Recorder.setupDownload = function(blob, filename)
     {
-        var url = (window.URL || window.webkitURL).createObjectURL(blob);
-        var link = document.getElementById("save");
-        link.href = url;
-        link.download = filename || 'output.wav';
-    }
+        //var url = (window.URL || window.webkitURL).createObjectURL(blob);
+        //var link = document.getElementById("save");
+        //link.href = url;
+        //link.download = filename || 'output.wav';
+    };
 
     window.Recorder = Recorder;
 
@@ -324,459 +324,6 @@ function AudioCallbackDummy()
     buffers.push([]);
     buffers.push([]);
     AudioCallback(buffers);
-}
-
-function AudioCallback(raw)
-{
-    /*if (performance.now() - raw[2] > SET_MaxCallbackLag)
-    {
-        return;
-    }*/
-
-    const OneIndex = 11;
-
-    if (WORK_Spectrum && (WaveDisplayCanvasWX > 0) && (WaveDisplayCanvasH > 0))
-    {
-        var DISP_Mode_ = (DISP_Mode < 2) ? DISP_Mode : 0;
-    
-        var datacount = raw[1];
-        var CanvasLineY = CanvasLine * CanvasLineNum * (DISP_Mode_ + 1);
-        var DrawPointerX = 0;
-
-        var CanvasHalf = Math.floor(WaveDisplayCanvasWX / 2);
-        var CanvasHalfY = 0;
-
-        var Zoom_ = Math.pow(2, DISP_Zoom + 9)
-        var OverdriveI;
-        var OverdriveO;
-        var Position = 0;
-        var DrawPointer0;
-        var CanvasLineY0;
-        var DISP_ModeX = DISP_Mode_ + 1;
-
-        var DataR;
-        var DataG;
-        var DataB;
-        var Len;
-        var Len_;
-        var LenO;
-        var Zoom1;
-        var Zoom2;
-        var I_;
-        var I_M;
-        var I_M_Start;
-        var IsOverdrive_;
-        var IsOverdrive;
-        var DatumR;
-        var DatumG;
-        var DatumB;
-
-        var MemFreeIdx = 1;
-        var ScaleDataI;
-        var ScaleDataT;
-        var ScaleDataL_;
-
-        for (var ii = 0; ii < datacount; ii++)
-        {
-            OverdriveI = raw[ii * OneIndex + 12][0] * 1000;
-            OverdriveO = raw[ii * OneIndex + 12][1] * 1000;
-
-            Position = raw[ii * OneIndex + 13];
-            DrawPointer0 = DrawPointer - Position;
-
-            CanvasLineY0 = CanvasLineY;
-            if (Position > 0)
-            {
-                if (DISP_Mode < 2)
-                {
-                    while (DrawPointer0 < 0)
-                    {
-                        DrawPointer0 += WaveDisplayCanvasWX + 1;
-                        CanvasLineY0 -= CanvasLine * DISP_ModeX;
-                        if (CanvasLineY0 < 0)
-                        {
-                            CanvasLineY0 += CanvasLine * DISP_Line * DISP_ModeX;
-                        }
-                    }
-                }
-                else
-                {
-                    while (DrawPointer0 < 0)
-                    {
-                        DrawPointer0 += WaveDisplayCanvasWX - 1;
-                        CanvasLineY0 -= CanvasLine * DISP_ModeX;
-                    }
-                }
-            }
-
-            if (DISP_Mode == 1)
-            {
-                DrawPointerX = DrawPointer0 - CanvasHalf;
-                CanvasHalfY = CanvasLine;
-                if (DrawPointerX < 0)
-                {
-                    DrawPointerX = DrawPointerX + WaveDisplayCanvasWX + 1;
-                    if (((CanvasLineY0 + CanvasHalfY) >= 0) && (CanvasLineY0 > 0))
-                    {
-                        CanvasHalfY = 0 - CanvasLine;
-                    }
-                    else
-                    {
-                        CanvasHalfY = ((DISP_Line * 2) - 1) * CanvasLine;
-                    }
-                }
-            }
-
-            DataR = raw[ii * OneIndex + 3 + SET_AudioModeR];
-            DataG = raw[ii * OneIndex + 3 + SET_AudioModeG];
-            DataB = raw[ii * OneIndex + 3 + SET_AudioModeB];
-            Len_ = DataR.length - 1;
-            Len = Math.floor(Len_ / 2);
-            ScaleCalc(Len);
-
-            Zoom1 = Math.floor(Zoom_ / Len);
-            Zoom2 = Math.floor(Len / Zoom_);
-            IsOverdrive_ = ((OverdriveI > SET_DrawOverdriveThresholdI) || (OverdriveO > SET_DrawOverdriveThresholdO));
-            if (Zoom1 < 1)
-            {
-                Zoom1 = 1;
-            }
-            if (Zoom2 < 1)
-            {
-                Zoom2 = 1;
-            }
-
-            LenO = DISP_Offs * Len / 64;
-            if (SET_FlipBand)
-            {
-                I_M_Start = MarkerCountS - 1;
-            }
-            else
-            {
-                I_M_Start = 0;
-            }
-
-            if (CanvasLineY0 >= 0)
-            {
-                for (var i = 0; i < CanvasLine; i++)
-                {
-                    if (SET_FlipBand)
-                    {
-                        I_ = Math.floor((((CanvasLine - i - 1) * Zoom2) / Zoom1) + LenO);
-                    }
-                    else
-                    {
-                        I_ = Math.floor(((i * Zoom2) / Zoom1) + LenO);
-                    }
-                    DatumR = 0;
-                    DatumG = 0;
-                    DatumB = 0;
-                    if ((I_ >= 0) && (I_ < Len))
-                    {
-                        if (ScaleDataL[I_] > 0)
-                        {
-                            ScaleDataL_ = ScaleDataL[I_];
-                            ScaleDataT = ScaleData[I_];
-                            for (ScaleDataI = ScaleDataL_ - 1; ScaleDataI >= 0; ScaleDataI--)
-                            {
-                                DatumR += (DataR[ScaleDataT[ScaleDataI]] * AudioGainR);
-                                DatumG += (DataG[ScaleDataT[ScaleDataI]] * AudioGainG);
-                                DatumB += (DataB[ScaleDataT[ScaleDataI]] * AudioGainB);
-                            }
-                            DatumR = Math.round(DatumR / ScaleDataL_);
-                            DatumG = Math.round(DatumG / ScaleDataL_);
-                            DatumB = Math.round(DatumB / ScaleDataL_);
-                        }
-                        IsOverdrive = IsOverdrive_;
-                    }
-                    else
-                    {
-                        IsOverdrive = false;
-                    }
-
-                    if (IsOverdrive)
-                    {
-                        WaveDisplayCanvasDataR = ((SET_DrawOverdriveColorR * SET_DrawOverdriveColorA) + (DrawPaletteR[DatumR] * SET_DrawOverdriveColorX)) / 255;
-                        WaveDisplayCanvasDataG = ((SET_DrawOverdriveColorG * SET_DrawOverdriveColorA) + (DrawPaletteG[DatumG] * SET_DrawOverdriveColorX)) / 255;
-                        WaveDisplayCanvasDataB = ((SET_DrawOverdriveColorB * SET_DrawOverdriveColorA) + (DrawPaletteB[DatumB] * SET_DrawOverdriveColorX)) / 255;
-                    }
-                    else
-                    {
-                        WaveDisplayCanvasDataR = DrawPaletteR[DatumR];
-                        WaveDisplayCanvasDataG = DrawPaletteG[DatumG];
-                        WaveDisplayCanvasDataB = DrawPaletteB[DatumB];
-                    }
-                    if (DISP_VU__ == 0)
-                    {
-                        if (SET_FlipBand)
-                        {
-                            for (I_M = I_M_Start; I_M >= 0; I_M--)
-                            {
-                                if (I_ == MarkerFreqS[I_M])
-                                {
-                                    WaveDisplayCanvasDataR = MarkerColorRS[I_M];
-                                    WaveDisplayCanvasDataG = MarkerColorGS[I_M];
-                                    WaveDisplayCanvasDataB = MarkerColorBS[I_M];
-                                    I_M_Start = I_M;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (I_M = I_M_Start; I_M < MarkerCountS; I_M++)
-                            {
-                                if (I_ == MarkerFreqS[I_M])
-                                {
-                                    WaveDisplayCanvasDataR = MarkerColorRS[I_M];
-                                    WaveDisplayCanvasDataG = MarkerColorGS[I_M];
-                                    WaveDisplayCanvasDataB = MarkerColorBS[I_M];
-                                    I_M_Start = I_M;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    DrawRectX(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointer0 << CanvasDrawStepX, CanvasLineY0 + CanvasLine - i - 1, CanvasDrawStep, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
-                    if (DISP_Mode == 1)
-                    {
-                        DrawRectX(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointerX << CanvasDrawStepX, CanvasLineY0 + CanvasLine + CanvasHalfY - i - 1, CanvasDrawStep, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
-                    }
-                }
-            }
-            if (SET_AudioPlayerDrawBuf)
-            {
-                if (Position == 0)
-                {
-                    AudioPlayerDrawBuffer(DrawPointer0 << CanvasDrawStepX, CanvasLineY0 + CanvasLine - 1, CanvasLineY0, CanvasDrawStep);
-                    if (DISP_Mode == 1)
-                    {
-                        AudioPlayerDrawBuffer(DrawPointerX << CanvasDrawStepX, CanvasLineY0 + CanvasHalfY + CanvasLine - 1, CanvasLineY0 + CanvasHalfY, CanvasDrawStep);
-                    }
-                }
-            }
-
-
-            DatumR = DataR[Len_];
-            DatumG = DataG[Len_];
-            DatumB = DataB[Len_];
-            if (DatumR >= 0)
-            {
-                MemFreeIndex[MemFreeIdx] = DatumR;
-                MemFreeIdx++
-            }
-            if ((DatumG >= 0) && (DatumR != DatumG))
-            {
-                MemFreeIndex[MemFreeIdx] = DatumG;
-                MemFreeIdx++
-            }
-            if ((DatumB >= 0) && ((DatumR != DatumB) || (DatumG != DatumB)))
-            {
-                MemFreeIndex[MemFreeIdx] = DatumB;
-                MemFreeIdx++
-            }
-
-
-            if (DISP_Mode == 2)
-            {
-                CanvasLineNum = DISP_Line - 1;
-                var CanW = (WaveDisplayCanvasW >> CanvasDrawStepX);
-                
-                if (Position == 0)
-                {
-                    DrawPointer = (WaveDisplayCanvasW - SET_DrawStripSize);
-                    DrawPointer = (DrawPointer >> CanvasDrawStepX) - 1;
-
-                    
-                    DrawCopy(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, CanvasDrawStep, 0, 0, 0, WaveDisplayCanvasW - CanvasDrawStep, WaveDisplayCanvasH);
-                    if (CanvasDrawStep > 1)
-                    {
-                        DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, CanW << CanvasDrawStepX, 0, CanvasDrawStep, WaveDisplayCanvasH, 0, 0, 0);
-                    }
-
-                }
-
-                if ((Position == 0) || (DrawPointer0 < DISP_Line))
-                {
-                    if (CanvasLineNum > 0)
-                    {
-                        var DrawPos = (WaveDisplayCanvasW >> CanvasDrawStepX) - 1;
-                        DrawCopy(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, 0, CanvasLine, DrawPos << CanvasDrawStepX, 0, CanvasDrawStep, CanvasLine * CanvasLineNum);
-                    }
-                }
-                
-
-
-                CanvasLineY = CanvasLine * CanvasLineNum;
-            }
-
-            if (Position == 0)
-            {
-                if (DISP_Mode < 2)
-                {
-                    DrawPointer++;
-                    if (DrawPointer > (WaveDisplayCanvasWX))
-                    {
-                        DrawPointer = 0;
-                        CanvasLineNum++;
-                        if (CanvasLineNum >= DISP_Line)
-                        {
-                            CanvasLineNum = 0;
-                        }
-                        CanvasLineY = CanvasLine * CanvasLineNum * (DISP_Mode_ + 1);
-                    }
-                }
-
-                if (DISP_Mode == 1)
-                {
-                    DrawPointerX = DrawPointer - CanvasHalf;
-                    CanvasHalfY = CanvasLine;
-                    if (DrawPointerX < 0)
-                    {
-                        DrawPointerX = DrawPointerX + WaveDisplayCanvasWX + 1;
-                        if (CanvasLineNum > 0)
-                        {
-                            CanvasHalfY = 0 - CanvasLine;
-                        }
-                        else
-                        {
-                            CanvasHalfY = ((DISP_Line * 2) - 1) * CanvasLine;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (datacount > 0)
-        {
-            MemFreeIndex[0] = MemFreeIdx;
-            audioRecorder.datafree();
-        }
-        else
-        {
-            if (DISP_Mode == 1)
-            {
-                DrawPointerX = DrawPointer - CanvasHalf;
-                CanvasHalfY = CanvasLine;
-                if (DrawPointerX < 0)
-                {
-                    DrawPointerX = DrawPointerX + WaveDisplayCanvasWX + 1;
-                    if (CanvasLineNum > 0)
-                    {
-                        CanvasHalfY = 0 - CanvasLine;
-                    }
-                    else
-                    {
-                        CanvasHalfY = ((DISP_Line * 2) - 1) * CanvasLine;
-                    }
-                }
-            }
-        }
-
-        if ((Position == 0) && (SET_DrawStripSize > 0))
-        {
-            var CanvasLineY0 = CanvasLineY;
-            var CanvasLineH0 = CanvasLine;
-            var CanvasLineOffset = 0;
-            WaveDisplayCanvasDataR = DrawPaletteR[0];
-            WaveDisplayCanvasDataG = DrawPaletteG[0];
-            WaveDisplayCanvasDataB = DrawPaletteB[0];
-            
-            var DrawPointerOffset = 0;
-            
-            if (DISP_Mode == 2)
-            {
-                DrawPointerOffset = 1;
-            }
-            DrawPointer += DrawPointerOffset;
-            
-            DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointer << CanvasDrawStepX, CanvasLineY0, SET_DrawStripSize, CanvasLineH0, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
-            if (DISP_Mode == 1)
-            {
-                DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointerX << CanvasDrawStepX, CanvasLineY0 + CanvasHalfY, SET_DrawStripSize, CanvasLineH0, WaveDisplayCanvasDataR, WaveDisplayCanvasDataG, WaveDisplayCanvasDataB);
-            }
-            var OffsetX;
-
-            if (SET_FlipBand)
-            {
-                OffsetX = CanvasLine + (Zoom_ * DISP_Offs / 64);
-            }
-            else
-            {
-                OffsetX = Zoom_ - (Zoom_ * DISP_Offs / 64);
-            }
-
-
-            if (CanvasLine > OffsetX)
-            {
-                if (Zoom_ > OffsetX)
-                {
-                    CanvasLineH0 = OffsetX;
-                }
-                else
-                {
-                    CanvasLineH0 = Zoom_;
-                }
-                CanvasLineY0 = CanvasLineY + CanvasLine - OffsetX;
-            }
-            else
-            {
-                CanvasLineOffset = OffsetX - CanvasLine;
-                if (SET_FlipBand)
-                {
-                    if (OffsetX > Zoom_)
-                    {
-                        CanvasLineH0 = CanvasLine - (OffsetX - Zoom_);
-                    }
-                }
-                else
-                {
-                    if (DISP_Offs < 0)
-                    {
-                        CanvasLineH0 = CanvasLine - (OffsetX - Zoom_);
-                    }
-                }
-            }
-            
-            ScaleCalcStrip(Zoom_, CanvasLineH0, CanvasLineOffset);
-            for (var i = 0; i < ScaleStripColor.length; i++)
-            {
-                var Y__ = CanvasLineY0 + ScaleStripColor[i][0];
-                var H__ = ScaleStripColor[i][1];
-
-                DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointer << CanvasDrawStepX, Y__, SET_DrawStripSize, H__, ScaleStripColor[i][2], ScaleStripColor[i][3], ScaleStripColor[i][4]);
-                if (DISP_Mode == 1)
-                {
-                    DrawRect(WaveDisplayCanvasData, WaveDisplayCanvasW_, WaveDisplayCanvasH_, DrawPointerX << CanvasDrawStepX, Y__ + CanvasHalfY, SET_DrawStripSize, H__, ScaleStripColor[i][2], ScaleStripColor[i][3], ScaleStripColor[i][4]);
-                }
-
-            }
-            
-            DrawPointer -= DrawPointerOffset;
-        }
-
-        DrawRefresh(WaveDisplayCanvasContext, WaveDisplayCanvasData);
-    }
-
-    if (WORK_Scope)
-    {
-        var ScopeArrayWH = raw[raw[1] * OneIndex + 3];
-        if ((ScopeArrayWH[0] == SET_ScopeW_) && (ScopeArrayWH[1] == SET_ScopeH_))
-        {
-            var ScopeArrayI = raw[raw[1] * OneIndex + 4];
-            var ScopeArrayO = raw[raw[1] * OneIndex + 5];
-            for (var X = 0; X < SET_ScopeW_; X++)
-            {
-                for (var Y = 0; Y < SET_ScopeH_; Y++)
-                {
-                    var V = [0, ScopeArrayI[X][Y], ScopeArrayO[X][Y]];
-                    ScopeDrawPxl(X, Y, DrawPaletteR[V[SET_ScopeAudioR]], DrawPaletteG[V[SET_ScopeAudioG]], DrawPaletteB[V[SET_ScopeAudioB]]);
-                }
-            }
-            ScopeDrawRefresh();
-        }
-    }
 }
 
 var IsRecording = false;
@@ -1362,7 +909,18 @@ function SetFFT()
     }
     MarkerCalc();
 
-    audioRecorder.Msg({ command: 'fft', WORK_Spectrum: WORK_Spectrum, DispMode: DISP_VU__, FFT: FFT_, Win: Win_, FFTWin: SET_FFTWindow, FFTDecimation: FFTDecimation, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: AudioModeVal, DispSize: (DISP_Line * WaveDisplayCanvasWX) - Math.ceil(SET_DrawStripSize / CanvasDrawStep) + 1, BufTick: Math.ceil(SET_BufTick / CanvasDrawStep), Log: SET_DrawLog, LogBase: SET_DrawLogBase / 1000, LogFactor: SET_DrawLogFactor / 1000, LogOffset: SET_DrawLogOffset / 1000, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
+    var RealDispSize = DisplayMaxPos();
+    if ((RealDispSize < Math.ceil(SET_SaveLength / CanvasDrawStep)) && (SET_SaveEnabled == 2))
+    {
+        RealDispSize = Math.ceil(SET_SaveLength / CanvasDrawStep);
+    }
+    SaveInfo();
+    audioRecorder.Msg({ command: 'fft', WORK_Spectrum: WORK_Spectrum, DispMode: DISP_VU__, FFT: FFT_, Win: Win_, FFTWin: SET_FFTWindow, FFTDecimation: FFTDecimation, MinMax: MinMax_, Gain: Gain_, Step: Step_, Base: Base_, Decimation: SET_SampleDecimation, AudioMode: AudioModeVal, DispSize: RealDispSize, BufTick: Math.ceil(SET_BufTick / CanvasDrawStep), Log: SET_DrawLog, LogBase: SET_DrawLogBase / 1000, LogFactor: SET_DrawLogFactor / 1000, LogOffset: SET_DrawLogOffset / 1000, WFBack: SET_WaveformBack, WFFore: SET_WaveformFore });
+}
+
+function DisplayMaxPos()
+{
+    return (DISP_Line * WaveDisplayCanvasWX) - Math.ceil(SET_DrawStripSize / CanvasDrawStep) + 1;
 }
 
 function SetScope()

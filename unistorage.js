@@ -45,7 +45,7 @@ function DataExists(name)
     {
         if (document.cookie !== "")
         {
-            const cookies = document.cookie.split(/; */);
+            const cookies = document.cookie.split(new RegExp("; *", ""));
 
             for (let i=0; i<cookies.length; i++)
             {
@@ -71,7 +71,7 @@ function DataGet(name)
     {
         if (document.cookie !== "")
         {
-            const cookies = document.cookie.split(/; */);
+            const cookies = document.cookie.split(new RegExp("; *", ""));
 
             for (let i=0; i<cookies.length; i++)
             {

@@ -100,7 +100,7 @@ var FilterSlotObj = function(FilterNo_)
         }
 
         this.FilterWindowFFT = null;
-    }
+    };
 
     this.FilterNormalize = function(FilterConfSize_, ValMin, ValMax)
     {
@@ -127,7 +127,7 @@ var FilterSlotObj = function(FilterNo_)
             if (this.FilterArrayLevel[I] > ValMax) { this.FilterArrayLevel[I] = ValMax; }
         }
         this.FilterSave();
-    }
+    };
 
     this.FilterAdd = function()
     {
@@ -152,7 +152,7 @@ var FilterSlotObj = function(FilterNo_)
         {
             this.FilterConfShapeSet(-1);
         }
-    }
+    };
 
     this.FilterRem = function()
     {
@@ -176,7 +176,7 @@ var FilterSlotObj = function(FilterNo_)
         {
             this.FilterConfShapeSet(1);
         }
-    }
+    };
 
     this.FilterConfShapeSet = function(N)
     {
@@ -189,7 +189,7 @@ var FilterSlotObj = function(FilterNo_)
         {
             this.FilterConfShape = 2;
         }
-    }
+    };
 
 
     this.FilterVal = function(N, ValMin, ValMax)
@@ -217,7 +217,7 @@ var FilterSlotObj = function(FilterNo_)
                 this.FilterWindowSize = 1;
             }
         }
-    }
+    };
 
     this.FilterPos = function(T, N)
     {
@@ -241,7 +241,7 @@ var FilterSlotObj = function(FilterNo_)
                 this.FilterArrayPoint[this.FilterArraySelected + T] = this.FilterArrayPoint[this.FilterArraySelected + T + 1] - 1;
             }
         }
-    }
+    };
 
     this.FilterLoad = function()
     {
@@ -270,7 +270,7 @@ var FilterSlotObj = function(FilterNo_)
             this.FilterArrayPoint.push(this.FilterConfSize);
             this.FilterArrayLevel.push(0);
         }
-    }
+    };
 
     this.FilterSave = function()
     {
@@ -286,5 +286,5 @@ var FilterSlotObj = function(FilterNo_)
         }
 
         DataSet("OBJ_Filter_Slot" + this.FilterNo, FilterDef)
-    }
-}
+    };
+};

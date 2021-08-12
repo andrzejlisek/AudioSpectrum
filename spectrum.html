@@ -5,6 +5,7 @@
         <meta charset="utf-8">
         <title>Spectrogram</title>
         <script src="unistorage.js"></script>
+        <script src="save.js"></script>
         <script src="scale.js"></script>
         <script src="color.js"></script>
         <script src="audioplayer.js"></script>
@@ -18,6 +19,7 @@
         <script src="draw.js"></script>
         <script src="layout.js"></script>
         <script src="core.js"></script>
+        <script src="corecallback.js"></script>
         <script src="filterfft.js"></script>
         <script src="scope.js"></script>
         <script src="worker.js"></script>
@@ -51,11 +53,11 @@
                     <td colspan="2">LAYOUT:</td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_Layout_Order">Module (0-5) order:</label></td>
+                    <td><label for="xSET_Layout_Order">Module (0-7) order:</label></td>
                     <td><input type="text" id="xSET_Layout_Order" onchange="LayoutSettingsSet();" size="5"></td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_Layout_SpectrogramSizeV">[0] Spectrogram size:</label></td>
+                    <td><label for="xSET_Layout_SpectrogramSizeV">[0] Spectrogram:</label></td>
                     <td><input type="text" id="xSET_Layout_SpectrogramSizeV" onchange="LayoutSettingsSet();" size="5"></td>
                 </tr>
                 <tr>
@@ -68,7 +70,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_Layout_OscilloscopeSizeV">[1] Stereo scope size:</label></td>
+                    <td><label for="xSET_Layout_OscilloscopeSizeV">[1] Stereo scope:</label></td>
                     <td><input type="text" id="xSET_Layout_OscilloscopeSizeV" onchange="LayoutSettingsSet();" size="5"></td>
                 </tr>
                 <tr>
@@ -81,7 +83,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_Layout_FilterSizeV">[2] Filter size:</label></td>
+                    <td><label for="xSET_Layout_FilterSizeV">[2] Filter:</label></td>
                     <td><input type="text" id="xSET_Layout_FilterSizeV" onchange="LayoutSettingsSet();" size="5"></td>
                 </tr>
                 <tr>
@@ -94,7 +96,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_Layout_ProcessSizeV">[3] Process control size:</label></td>
+                    <td><label for="xSET_Layout_ProcessSizeV">[3] Process control:</label></td>
                     <td><input type="text" id="xSET_Layout_ProcessSizeV" onchange="LayoutSettingsSet();" size="5"></td>
                 </tr>
                 <tr>
@@ -107,13 +109,52 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><label for="xSET_Layout_PlaylistSizeV">[4] Playlist size:</label></td>
+                    <td><label for="xSET_Layout_PlaylistSizeV">[4] Playlist:</label></td>
                     <td><input type="text" id="xSET_Layout_PlaylistSizeV" onchange="LayoutSettingsSet();" size="5"></td>
                 </tr>
                 <tr>
                     <td><label for="xSET_Layout_PlaylistSizeU"></label></td>
                     <td>
                         <select id="xSET_Layout_PlaylistSizeU" onchange="LayoutSettingsSet();">
+                            <option value="0">Pixels</option>
+                            <option value="1">Percent</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Layout_SaveImageSizeV">[5] Save image:</label></td>
+                    <td><input type="text" id="xSET_Layout_SaveImageSizeV" onchange="LayoutSettingsSet();" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Layout_SaveImageSizeU"></label></td>
+                    <td>
+                        <select id="xSET_Layout_SaveImageSizeU" onchange="LayoutSettingsSet();">
+                            <option value="0">Pixels</option>
+                            <option value="1">Percent</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Layout_SpecMarkerSizeV">[6] Spectr. markers:</label></td>
+                    <td><input type="text" id="xSET_Layout_SpecMarkerSizeV" onchange="LayoutSettingsSet();" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Layout_SpecMarkerSizeU"></label></td>
+                    <td>
+                        <select id="xSET_Layout_SpecMarkerSizeU" onchange="LayoutSettingsSet();">
+                            <option value="0">Pixels</option>
+                            <option value="1">Percent</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Layout_SpecStripSizeV">[7] Spectr. strip:</label></td>
+                    <td><input type="text" id="xSET_Layout_SpecStripSizeV" onchange="LayoutSettingsSet();" size="5"></td>
+                </tr>
+                <tr>
+                    <td><label for="xSET_Layout_SpecStripSizeU"></label></td>
+                    <td>
+                        <select id="xSET_Layout_SpecStripSizeU" onchange="LayoutSettingsSet();">
                             <option value="0">Pixels</option>
                             <option value="1">Percent</option>
                         </select>
@@ -1237,6 +1278,7 @@
 
         <!-- Process begin -->
         <div id="AppProcess" style="width:100%;height:500px;border-style:solid;border-width:1px;overflow:scroll;background:white;">
+            Process control<br>
             <input type="button" onclick="ProcessAdd1()" value="Add before first">
             <input type="button" onclick="ProcessAdd2()" value="Add after last">
             <br>
@@ -1316,7 +1358,85 @@
                     <td><input type="button" onclick="ProcessClear(9)" value="Clear 9"></td>
                 </tr>
             </table>
-            <hr>
+        </div>
+        <!-- Process end -->
+
+        <!-- Playlist begin -->
+        <div id="AppPlaylist" style="width:100%;height:500px;border-style:solid;border-width:1px;overflow:scroll;background:white;">
+            Playlist<br>
+            <input type="button" value="Settings" onclick="BtnAction(0)">
+            <select id="PlaylistMode" onchange="PlaylistSetMode()">
+                <option>Live audio</option>
+                <option>Audio from playlist</option>
+            </select>
+            <br>
+            <input type="button" value="|<" onclick="PlaylistFunc(-3)">
+            <input type="button" value="<<" onclick="PlaylistFunc(-2)">
+            <input type="button" value="<"  onclick="PlaylistFunc(-1)">
+            <input type="button" value="[]" onclick="PlaylistFunc(0)">
+            <input type="button" value=">"  onclick="PlaylistFunc(1)">
+            <input type="button" value=">>" onclick="PlaylistFunc(2)">
+            <input type="button" value=">|" onclick="PlaylistFunc(3)">
+            <br>
+            <span id="PlaylistInfo"></span>
+            <br>
+            <table id="Playlist" border="1" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>Operations</th>
+                    <th>Index</th>
+                    <th>File&nbsp;name</th>
+                    <th>Sample&nbsp;rate</th>
+                    <th>Channels</th>
+                    <th>Length</th>
+                </tr>
+            </table>
+            Add audio files: <input type="file" id="AudioRecordFile" onchange="PlaylistLoadFile()" multiple="multiple">
+        </div>
+        <!-- Playlist end -->
+
+        <!-- Image save begin -->
+        <div id="AppSave" style="width:100%;height:500px;border-style:solid;border-width:1px;overflow:scroll;background:white;">
+            Save image<br>
+            Time length: <input type="number" size="5" min="1" id="xSET_SaveLength" onchange="SaveSettingsSet(1)"><br>
+            Generation: <select id="xSET_SaveEnabled" onchange="SaveSettingsSet(1)">
+                <option value="0">None</option>
+                <option value="1">Current</option>
+                <option value="2">Whole</option>
+            </select><br>
+            Orientation: <select id="xSET_SaveOrientation" onchange="SaveSettingsSet(0)">
+                <option value="0">0&#176; no flip</option>
+                <option value="1">90&#176; no flip</option>
+                <option value="2">180&#176; no flip</option>
+                <option value="3">270&#176; no flip</option>
+                <option value="4">0&#176; flip</option>
+                <option value="5">90&#176; flip</option>
+                <option value="6">180&#176; flip</option>
+                <option value="7">270&#176; flip</option>
+            </select><br>
+            Strip size: <input type="number" size="5" min="0" id="xSET_SaveStripSize" onchange="SaveSettingsSet(0)"><br>
+            Time numerator: <input type="number" size="5" min="1" id="xSET_SaveStepN" onchange="SaveSettingsSet(0)"><br>
+            Time denominator: <input type="number" size="5" min="1" id="xSET_SaveStepD" onchange="SaveSettingsSet(0)"><br>
+            Frequency numerator: <input type="number" size="5" min="1" id="xSET_SaveZoomN" onchange="SaveSettingsSet(0)"><br>
+            Frequency denominator: <input type="number" size="5" min="1" id="xSET_SaveZoomD" onchange="SaveSettingsSet(0)"><br>
+            Show strip percent: <input type="number" size="5" min="0" id="xSET_SaveStripPercent" onchange="SaveSettingsSet(0)"><br>
+            Show scrollbar margin: <input type="number" size="5" min="0" id="xSET_SaveStripMargin" onchange="SaveSettingsSet(0)"><br>
+            Image size and time: <span id="SaveInfo"></span><br>
+
+
+            <input type="button" value="Show spectrogram" onclick="SaveDownload(2)" id="SaveDownloadBtn2">
+            <input type="button" value="Save spectrogram" onclick="SaveDownload(1)" id="SaveDownloadBtn1">
+            <a href="" id="savelink"></a>
+            <canvas id="savedisplay" width="1" height="1" style="display:none">
+            </canvas>
+            <canvas id="savedisplay1" width="1" height="1" style="display:none">
+            </canvas>
+            <canvas id="savedisplay2" width="1" height="1" style="display:none">
+            </canvas>
+        </div>
+        <!-- Image save end -->
+
+        <!-- Spectrogram markers begin -->
+        <div id="AppSpecMarker" style="width:100%;height:500px;border-style:solid;border-width:1px;overflow:scroll;background:white;">
             <table border="1" cellpadding="0" cellspacing="0">
                 <caption>Frequency markers</caption>
                 <tr>
@@ -1396,11 +1516,15 @@
                     <td><select id="xSET_Marker9Unit" onchange="MarkerForm(9)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
             </table>
-            <hr>
+        </div>
+        <!-- Spectrogram markers end -->
+
+        <!-- Spectrogram strip begin -->
+        <div id="AppSpecStrip" style="width:100%;height:500px;border-style:solid;border-width:1px;overflow:scroll;background:white;">
             <table border="2" cellpadding="0" cellspacing="0">
                 <caption>Spectrogram strip coloring</caption>
                 <tr>
-                    <td rowspan="12"><textarea rows="25" cols="50" id="ScaleStripColors" wrap="off" style="resize:none;width:100%;white-space:pre;overflow:auto;"></textarea></td>
+                    <td rowspan="12"><textarea rows="25" cols="70" id="ScaleStripColors" wrap="off" style="resize:none;width:100%;white-space:pre;overflow:auto;"></textarea></td>
                     <td colspan="2"><input type="button" style="width:100%" onclick="ScaleTextApply()" value="Apply"></td>
                 </tr>
                 <tr>
@@ -1448,40 +1572,7 @@
                 </tr>
             </table>
         </div>
-        <!-- Process end -->
-
-        <!-- Playlist begin -->
-        <div id="AppPlaylist" style="width:100%;height:500px;border-style:solid;border-width:1px;overflow:scroll;background:white;">
-            <input type="button" value="Settings" onclick="BtnAction(0)">
-            <select id="PlaylistMode" onchange="PlaylistSetMode()">
-                <option>Live audio</option>
-                <option>Audio from playlist</option>
-            </select>
-            <br>
-            <input type="button" value="|<" onclick="PlaylistFunc(-3)">
-            <input type="button" value="<<" onclick="PlaylistFunc(-2)">
-            <input type="button" value="<"  onclick="PlaylistFunc(-1)">
-            <input type="button" value="[]" onclick="PlaylistFunc(0)">
-            <input type="button" value=">"  onclick="PlaylistFunc(1)">
-            <input type="button" value=">>" onclick="PlaylistFunc(2)">
-            <input type="button" value=">|" onclick="PlaylistFunc(3)"">
-            <br>
-            <span id="PlaylistInfo"></span>
-            <br>
-            <table id="Playlist" border="1" cellpadding="0" cellspacing="0">
-                <tr>
-                    <th>Operations</th>
-                    <th>Index</th>
-                    <th>File&nbsp;name</th>
-                    <th>Sample&nbsp;rate</th>
-                    <th>Channels</th>
-                    <th>Length</th>
-                </tr>
-            </table>
-            Add audio files: <input type="file" id="AudioRecordFile" onchange="PlaylistLoadFile()" multiple="multiple">
-        </div>
-        <!-- Playlist end -->
-
+        <!-- Spectrogram strip end -->
 
         <script src="init.js"></script>
     </body>

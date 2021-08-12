@@ -117,7 +117,7 @@ function PlaylistRefreshTable()
 
         var PlaylistTableRowC = PlaylistTableRow.insertCell(4);
         ProcessTableCellStyle(PlaylistTableRowC);
-        PlaylistTableRowC.innerHTML = ""
+        PlaylistTableRowC.innerHTML = "";
         if (PlaylistChannels[N] == 1) { PlaylistTableRowC.innerHTML = "mono"; }
         if (PlaylistChannels[N] == 2) { PlaylistTableRowC.innerHTML = "stereo"; }
 

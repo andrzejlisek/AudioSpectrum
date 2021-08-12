@@ -27,6 +27,7 @@ SetColorPicker("xSET_Marker9Color");
 
 PlaylistTable = document.getElementById("Playlist");
 PlaylistInfo = document.getElementById("PlaylistInfo");
+SaveInit();
 MarkerInit();
 ScopeInit();
 FilterInit();

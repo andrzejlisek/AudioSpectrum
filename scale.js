@@ -540,7 +540,7 @@ function ScaleCalcPrepareStrip(Txt)
                 }
             }
         }
-        if (Txt0.length == 7)
+        if ((Txt0.length == 7) || (Txt0.length == 8))
         {
             if ((Txt0[0].length == 1) && (AllowedOp.includes(Txt0[0])))
             {
@@ -561,13 +561,21 @@ function ScaleCalcPrepareStrip(Txt)
                                         Txt0[4] = parseInt(Txt0[4]);
                                         Txt0[5] = parseInt(Txt0[5]);
                                         Txt0[6] = parseInt(Txt0[6]);
+                                        if (Txt0.length == 8)
+                                        {
+                                            Txt0[7] = parseInt(Txt0[7]);
+                                        }
+                                        else
+                                        {
+                                            Txt0[7] = parseInt("0");
+                                        }
                                         if ((Txt0[4] >= 0) && (Txt0[4] < 255))
                                         {
                                             if ((Txt0[5] >= 0) && (Txt0[5] < 255))
                                             {
                                                 if ((Txt0[6] >= 0) && (Txt0[6] < 255))
                                                 {
-                                                    ScaleStripConfig.push([2, Txt0[0], Txt0[1], Txt0[2], Txt0[3], Txt0[4], Txt0[5], Txt0[6]]);
+                                                    ScaleStripConfig.push([2, Txt0[0], Txt0[1], Txt0[2], Txt0[3], Txt0[4], Txt0[5], Txt0[6], Txt0[7]]);
                                                 }
                                             }
                                         }
@@ -653,39 +661,42 @@ function ScaleCalcStrip(L__, H__, O__)
     // Creating frequency table
     ScaleSampleRate = (CurrentSamplerate / SET_SampleDecimation);
     ScaleDataF = [];
-    if (SET_ScaleSetLog && (DISP_VU__ == 0))
+    if (DISP_VU__ == 0)
     {
-        var ScaleSetLogFactor_ = (SET_ScaleSetLogFactor * L__) / 1000;
-        var ScaleSetLogOffset_ = (SET_ScaleSetLogOffset * L__) / 1000;
-        var ScaleSetLogBase_ = SET_ScaleSetLogBase / 1000;
-        
-        for (var I = 0; I < L__; I++)
+        if (SET_ScaleSetLog && (DISP_VU__ == 0))
         {
-            if ((ScaleSetLogFactor_ > 0) && (ScaleSetLogBase_ > 1))
+            var ScaleSetLogFactor_ = (SET_ScaleSetLogFactor * L__) / 1000;
+            var ScaleSetLogOffset_ = (SET_ScaleSetLogOffset * L__) / 1000;
+            var ScaleSetLogBase_ = SET_ScaleSetLogBase / 1000;
+            
+            for (var I = 0; I < L__; I++)
             {
-                var Val = (Math.pow(ScaleSetLogBase_, (I - ScaleSetLogOffset_) / ScaleSetLogFactor_)) * L__;
-                Val = Val * (ScaleSampleRate / 2) / L__;
-                ScaleDataF.push(Val);
-            }
-            else
-            {
-                ScaleDataF.push(0);
+                if ((ScaleSetLogFactor_ > 0) && (ScaleSetLogBase_ > 1))
+                {
+                    var Val = (Math.pow(ScaleSetLogBase_, (I - ScaleSetLogOffset_) / ScaleSetLogFactor_)) * L__;
+                    Val = Val * (ScaleSampleRate / 2) / L__;
+                    ScaleDataF.push(Val);
+                }
+                else
+                {
+                    ScaleDataF.push(0);
+                }
             }
         }
-    }
-    else
-    {
-        for (var I = 0; I < L__; I++)
+        else
         {
-            var Val = I * (ScaleSampleRate / 2) / L__;
-            ScaleDataF.push(Val);
+            for (var I = 0; I < L__; I++)
+            {
+                var Val = I * (ScaleSampleRate / 2) / L__;
+                ScaleDataF.push(Val);
+            }
         }
     }
 
 
     // Creating color table against settings
     ScaleStripColor = [];
-    ScaleStripColor.push([0, L__, SET_DrawStripColorR, SET_DrawStripColorG, SET_DrawStripColorB]);
+    ScaleStripColor.push([0, L__, SET_DrawStripColorR, SET_DrawStripColorG, SET_DrawStripColorB, 0, 0]);
     if (DISP_VU__ == 0)
     {
         var BaseFreqs = [];
@@ -751,15 +762,22 @@ function ScaleCalcStrip(L__, H__, O__)
                             var Freq_R = ScaleStripConfig_[5];
                             var Freq_G = ScaleStripConfig_[6];
                             var Freq_B = ScaleStripConfig_[7];
+                            var BlendMode = parseInt(Math.floor(ScaleStripConfig_[8] / 100));
+                            var BlendValue = ScaleStripConfig_[8] % 100;
+                            if ((BlendMode > 0) && (BlendValue == 0))
+                            {
+                                BlendMode--;
+                                BlendValue = 100;
+                            }
                             if (Freq1_ <= Freq2_)
                             {
                                 if (SET_FlipBand)
                                 {
-                                    ScaleStripColor.push([Freq1_ - O__, Freq2_ - Freq1_ + 1, Freq_R, Freq_G, Freq_B]);
+                                    ScaleStripColor.push([Freq1_ - O__, Freq2_ - Freq1_ + 1, Freq_R, Freq_G, Freq_B, BlendMode, BlendValue]);
                                 }
                                 else
                                 {
-                                    ScaleStripColor.push([L__ - O__ - Freq2_ - 1, Freq2_ - Freq1_ + 1, Freq_R, Freq_G, Freq_B]);
+                                    ScaleStripColor.push([L__ - O__ - Freq2_ - 1, Freq2_ - Freq1_ + 1, Freq_R, Freq_G, Freq_B, BlendMode, BlendValue]);
                                 }
                             }
                         }

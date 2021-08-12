@@ -1,5 +1,5 @@
 
-var ProcessTable
+var ProcessTable;
 
 var ProcessData = new Array();
 var ProcessDataL = 0;
@@ -290,7 +290,7 @@ function ProcessSetButtons(N)
     Temp += "<input type=\"button\" value=\"" + ArrD_ + "\">";
     C1.innerHTML = Temp;
     var C2 = NRow.insertCell(1);
-    Temp = ""
+    Temp = "";
     Temp += "<select>";
     Temp += "<option>Null</option>";
     Temp += "<option>Filter</option>";

@@ -93,7 +93,7 @@ function FilterSettingsSet(Mode)
     SET_Filter_Canvas = Pow2(document.getElementById("xSET_Filter_Canvas").selectedIndex + 4);
     SET_FilterOrientation = document.getElementById("xSET_FilterOrientation").selectedIndex;
 
-    ColorTemp = ColorTextToValues(document.getElementById("xSET_FilterColorBack").value, SET_FilterColorBackR, SET_FilterColorBackG, SET_FilterColorBackB)
+    ColorTemp = ColorTextToValues(document.getElementById("xSET_FilterColorBack").value, SET_FilterColorBackR, SET_FilterColorBackG, SET_FilterColorBackB);
     SET_FilterColorBackR = Limit(ColorTemp[0], 0, 255);
     SET_FilterColorBackG = Limit(ColorTemp[1], 0, 255);
     SET_FilterColorBackB = Limit(ColorTemp[2], 0, 255);
@@ -188,7 +188,7 @@ function FilterInit()
 
 var FilterDrawRect_ = function(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function FilterDrawRect(X, Y, W, H, ColorR, ColorG, ColorB)
 {
@@ -197,7 +197,7 @@ function FilterDrawRect(X, Y, W, H, ColorR, ColorG, ColorB)
 
 var FilterDrawRectX_ = function(CanvasD, CanvasW, CanvasH, X, Y, W, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function FilterDrawRectX(X, Y, W, ColorR, ColorG, ColorB)
 {
@@ -206,7 +206,7 @@ function FilterDrawRectX(X, Y, W, ColorR, ColorG, ColorB)
 
 var FilterDrawRectY_ = function(CanvasD, CanvasW, CanvasH, X, Y, H, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function FilterDrawRectY(X, Y, H, ColorR, ColorG, ColorB)
 {
@@ -215,7 +215,7 @@ function FilterDrawRectY(X, Y, H, ColorR, ColorG, ColorB)
 
 var FilterDrawPxl_ = function(CanvasD, CanvasW, CanvasH, X, Y, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function FilterDrawPxl(X, Y, ColorR, ColorG, ColorB)
 {

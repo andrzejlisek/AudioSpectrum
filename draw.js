@@ -20,7 +20,7 @@ Base	X	Y	XY	Flip	90clk	90anti	180
 7	0	2	3	1	6	4	5
 */
 
-var DrawOrientationTransform_ = new Array(8)
+var DrawOrientationTransform_ = new Array(8);
 DrawOrientationTransform_[0] = [7, 5, 4, 6, 1, 3, 2];
 DrawOrientationTransform_[1] = [6, 4, 5, 7, 2, 0, 3];
 DrawOrientationTransform_[2] = [5, 7, 6, 4, 3, 1, 0];
@@ -49,7 +49,7 @@ function DrawOrientationTransform(N, Id)
 
 var DrawRect = function(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function DrawRect0(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB)
 {
@@ -196,9 +196,176 @@ function DrawRect7(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB
 }
 
 
+
+var DrawRectBlend = function(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB, Blend)
+{
+};
+
+function DrawRectBlend0(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB, Blend)
+{
+    var BlendX = 100 - Blend;
+    var BlendTotal = Blend + BlendX;
+    if (X < 0) { W = W + X; X = 0; }
+    if (Y < 0) { H = H + Y; Y = 0; }
+    if (X + W > CanvasW) { W = CanvasW - X; }
+    if (Y + H > CanvasH) { H = CanvasH - Y; }
+    for (var YY = 0; YY < H; YY++)
+    {
+        for (var XX = 0; XX < W; XX++)
+        {
+            var Offset = ((Y + YY) * CanvasW + (X + XX)) << 2;
+            CanvasD.data[Offset + 0] = ((CanvasD.data[Offset + 0] * BlendX) + (ColorR * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 1] = ((CanvasD.data[Offset + 1] * BlendX) + (ColorG * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 2] = ((CanvasD.data[Offset + 2] * BlendX) + (ColorB * Blend)) / BlendTotal;
+        }
+    }
+}
+
+function DrawRectBlend1(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB, Blend)
+{
+    var BlendX = 100 - Blend;
+    var BlendTotal = Blend + BlendX;
+    if (X < 0) { W = W + X; X = 0; }
+    if (Y < 0) { H = H + Y; Y = 0; }
+    if (X + W > CanvasH) { W = CanvasH - X; }
+    if (Y + H > CanvasW) { H = CanvasW - Y; }
+    for (var YY = 0; YY < W; YY++)
+    {
+        for (var XX = 0; XX < H; XX++)
+        {
+            var Offset = ((X + YY) * CanvasW + (CanvasW - H - Y + XX)) << 2;
+            CanvasD.data[Offset + 0] = ((CanvasD.data[Offset + 0] * BlendX) + (ColorR * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 1] = ((CanvasD.data[Offset + 1] * BlendX) + (ColorG * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 2] = ((CanvasD.data[Offset + 2] * BlendX) + (ColorB * Blend)) / BlendTotal;
+        }
+    }
+}
+
+function DrawRectBlend2(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB, Blend)
+{
+    var BlendX = 100 - Blend;
+    var BlendTotal = Blend + BlendX;
+    if (X < 0) { W = W + X; X = 0; }
+    if (Y < 0) { H = H + Y; Y = 0; }
+    if (X + W > CanvasW) { W = CanvasW - X; }
+    if (Y + H > CanvasH) { H = CanvasH - Y; }
+    for (var YY = 0; YY < H; YY++)
+    {
+        for (var XX = 0; XX < W; XX++)
+        {
+            var Offset = ((CanvasH - H - Y + YY) * CanvasW + (CanvasW - W - X + XX)) << 2;
+            CanvasD.data[Offset + 0] = ((CanvasD.data[Offset + 0] * BlendX) + (ColorR * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 1] = ((CanvasD.data[Offset + 1] * BlendX) + (ColorG * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 2] = ((CanvasD.data[Offset + 2] * BlendX) + (ColorB * Blend)) / BlendTotal;
+        }
+    }
+}
+
+function DrawRectBlend3(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB, Blend)
+{
+    var BlendX = 100 - Blend;
+    var BlendTotal = Blend + BlendX;
+    if (X < 0) { W = W + X; X = 0; }
+    if (Y < 0) { H = H + Y; Y = 0; }
+    if (X + W > CanvasH) { W = CanvasH - X; }
+    if (Y + H > CanvasW) { H = CanvasW - Y; }
+    for (var YY = 0; YY < W; YY++)
+    {
+        for (var XX = 0; XX < H; XX++)
+        {
+            var Offset = ((CanvasH - W - X + YY) * CanvasW + (Y + XX)) << 2;
+            CanvasD.data[Offset + 0] = ((CanvasD.data[Offset + 0] * BlendX) + (ColorR * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 1] = ((CanvasD.data[Offset + 1] * BlendX) + (ColorG * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 2] = ((CanvasD.data[Offset + 2] * BlendX) + (ColorB * Blend)) / BlendTotal;
+        }
+    }
+}
+
+function DrawRectBlend4(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB, Blend)
+{
+    var BlendX = 100 - Blend;
+    var BlendTotal = Blend + BlendX;
+    if (X < 0) { W = W + X; X = 0; }
+    if (Y < 0) { H = H + Y; Y = 0; }
+    if (X + W > CanvasH) { W = CanvasH - X; }
+    if (Y + H > CanvasW) { H = CanvasW - Y; }
+
+    for (var YY = 0; YY < H; YY++)
+    {
+        for (var XX = 0; XX < W; XX++)
+        {
+            var Offset = ((X + XX) * CanvasW + (Y + YY)) << 2;
+            CanvasD.data[Offset + 0] = ((CanvasD.data[Offset + 0] * BlendX) + (ColorR * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 1] = ((CanvasD.data[Offset + 1] * BlendX) + (ColorG * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 2] = ((CanvasD.data[Offset + 2] * BlendX) + (ColorB * Blend)) / BlendTotal;
+        }
+    }
+}
+
+function DrawRectBlend5(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB, Blend)
+{
+    var BlendX = 100 - Blend;
+    var BlendTotal = Blend + BlendX;
+    if (X < 0) { W = W + X; X = 0; }
+    if (Y < 0) { H = H + Y; Y = 0; }
+    if (X + W > CanvasW) { W = CanvasW - X; }
+    if (Y + H > CanvasH) { H = CanvasH - Y; }
+    for (var YY = 0; YY < W; YY++)
+    {
+        for (var XX = 0; XX < H; XX++)
+        {
+            var Offset = ((CanvasH - H - Y + XX) * CanvasW + (X + YY)) << 2;
+            CanvasD.data[Offset + 0] = ((CanvasD.data[Offset + 0] * BlendX) + (ColorR * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 1] = ((CanvasD.data[Offset + 1] * BlendX) + (ColorG * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 2] = ((CanvasD.data[Offset + 2] * BlendX) + (ColorB * Blend)) / BlendTotal;
+        }
+    }
+}
+
+function DrawRectBlend6(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB, Blend)
+{
+    var BlendX = 100 - Blend;
+    var BlendTotal = Blend + BlendX;
+    if (X < 0) { W = W + X; X = 0; }
+    if (Y < 0) { H = H + Y; Y = 0; }
+    if (X + W > CanvasH) { W = CanvasH - X; }
+    if (Y + H > CanvasW) { H = CanvasW - Y; }
+    for (var YY = 0; YY < H; YY++)
+    {
+        for (var XX = 0; XX < W; XX++)
+        {
+            var Offset = ((CanvasH - W - X + XX) * CanvasW + (CanvasW - H - Y + YY)) << 2;
+            CanvasD.data[Offset + 0] = ((CanvasD.data[Offset + 0] * BlendX) + (ColorR * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 1] = ((CanvasD.data[Offset + 1] * BlendX) + (ColorG * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 2] = ((CanvasD.data[Offset + 2] * BlendX) + (ColorB * Blend)) / BlendTotal;
+        }
+    }
+}
+
+function DrawRectBlend7(CanvasD, CanvasW, CanvasH, X, Y, W, H, ColorR, ColorG, ColorB, Blend)
+{
+    var BlendX = 100 - Blend;
+    var BlendTotal = Blend + BlendX;
+    if (X < 0) { W = W + X; X = 0; }
+    if (Y < 0) { H = H + Y; Y = 0; }
+    if (X + W > CanvasW) { W = CanvasW - X; }
+    if (Y + H > CanvasH) { H = CanvasH - Y; }
+    for (var YY = 0; YY < W; YY++)
+    {
+        for (var XX = 0; XX < H; XX++)
+        {
+            var Offset = ((Y + XX) * CanvasW + (CanvasW - W - X + YY)) << 2;
+            CanvasD.data[Offset + 0] = ((CanvasD.data[Offset + 0] * BlendX) + (ColorR * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 1] = ((CanvasD.data[Offset + 1] * BlendX) + (ColorG * Blend)) / BlendTotal;
+            CanvasD.data[Offset + 2] = ((CanvasD.data[Offset + 2] * BlendX) + (ColorB * Blend)) / BlendTotal;
+        }
+    }
+}
+
+
 var DrawRectX = function(CanvasD, CanvasW, CanvasH, X, Y, W, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function DrawRectX0(CanvasD, CanvasW, CanvasH, X, Y, W, ColorR, ColorG, ColorB)
 {
@@ -322,7 +489,7 @@ function DrawRectX7(CanvasD, CanvasW, CanvasH, X, Y, W, ColorR, ColorG, ColorB)
 
 var DrawRectY = function(CanvasD, CanvasW, CanvasH, X, Y, H, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function DrawRectY0(CanvasD, CanvasW, CanvasH, X, Y, H, ColorR, ColorG, ColorB)
 {
@@ -446,7 +613,7 @@ function DrawRectY7(CanvasD, CanvasW, CanvasH, X, Y, H, ColorR, ColorG, ColorB)
 
 var DrawPxl = function(CanvasD, CanvasW, CanvasH, X, Y, ColorR, ColorG, ColorB)
 {
-}
+};
 
 function DrawPxl0(CanvasD, CanvasW, CanvasH, X, Y, ColorR, ColorG, ColorB)
 {
@@ -546,7 +713,7 @@ function DrawPxl7(CanvasD, CanvasW, CanvasH, X, Y, ColorR, ColorG, ColorB)
 
 var DrawCopy = function(CanvasD, CanvasW, CanvasH, X1, Y1, X2, Y2, W, H)
 {
-}
+};
 
 function DrawCopy0(CanvasD, CanvasW, CanvasH, X1, Y1, X2, Y2, W, H)
 {
@@ -757,13 +924,13 @@ function DrawSet(N)
 {
     switch (N)
     {
-        case 0: DrawRect = DrawRect0; DrawRectX = DrawRectX0; DrawRectY = DrawRectY0; DrawPxl = DrawPxl0; DrawCopy = DrawCopy0; return false;
-        case 1: DrawRect = DrawRect1; DrawRectX = DrawRectX1; DrawRectY = DrawRectY1; DrawPxl = DrawPxl1; DrawCopy = DrawCopy1; return true;
-        case 2: DrawRect = DrawRect2; DrawRectX = DrawRectX2; DrawRectY = DrawRectY2; DrawPxl = DrawPxl2; DrawCopy = DrawCopy2; return false;
-        case 3: DrawRect = DrawRect3; DrawRectX = DrawRectX3; DrawRectY = DrawRectY3; DrawPxl = DrawPxl3; DrawCopy = DrawCopy3; return true;
-        case 4: DrawRect = DrawRect4; DrawRectX = DrawRectX4; DrawRectY = DrawRectY4; DrawPxl = DrawPxl4; DrawCopy = DrawCopy4; return true;
-        case 5: DrawRect = DrawRect5; DrawRectX = DrawRectX5; DrawRectY = DrawRectY5; DrawPxl = DrawPxl5; DrawCopy = DrawCopy5; return false;
-        case 6: DrawRect = DrawRect6; DrawRectX = DrawRectX6; DrawRectY = DrawRectY6; DrawPxl = DrawPxl6; DrawCopy = DrawCopy6; return true;
-        case 7: DrawRect = DrawRect7; DrawRectX = DrawRectX7; DrawRectY = DrawRectY7; DrawPxl = DrawPxl7; DrawCopy = DrawCopy7; return false;
+        case 0: DrawRect = DrawRect0; DrawRectBlend = DrawRectBlend0; DrawRectX = DrawRectX0; DrawRectY = DrawRectY0; DrawPxl = DrawPxl0; DrawCopy = DrawCopy0; return false;
+        case 1: DrawRect = DrawRect1; DrawRectBlend = DrawRectBlend1; DrawRectX = DrawRectX1; DrawRectY = DrawRectY1; DrawPxl = DrawPxl1; DrawCopy = DrawCopy1; return true;
+        case 2: DrawRect = DrawRect2; DrawRectBlend = DrawRectBlend2; DrawRectX = DrawRectX2; DrawRectY = DrawRectY2; DrawPxl = DrawPxl2; DrawCopy = DrawCopy2; return false;
+        case 3: DrawRect = DrawRect3; DrawRectBlend = DrawRectBlend3; DrawRectX = DrawRectX3; DrawRectY = DrawRectY3; DrawPxl = DrawPxl3; DrawCopy = DrawCopy3; return true;
+        case 4: DrawRect = DrawRect4; DrawRectBlend = DrawRectBlend4; DrawRectX = DrawRectX4; DrawRectY = DrawRectY4; DrawPxl = DrawPxl4; DrawCopy = DrawCopy4; return true;
+        case 5: DrawRect = DrawRect5; DrawRectBlend = DrawRectBlend5; DrawRectX = DrawRectX5; DrawRectY = DrawRectY5; DrawPxl = DrawPxl5; DrawCopy = DrawCopy5; return false;
+        case 6: DrawRect = DrawRect6; DrawRectBlend = DrawRectBlend6; DrawRectX = DrawRectX6; DrawRectY = DrawRectY6; DrawPxl = DrawPxl6; DrawCopy = DrawCopy6; return true;
+        case 7: DrawRect = DrawRect7; DrawRectBlend = DrawRectBlend7; DrawRectX = DrawRectX7; DrawRectY = DrawRectY7; DrawPxl = DrawPxl7; DrawCopy = DrawCopy7; return false;
     }
 }
