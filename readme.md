@@ -404,12 +404,19 @@ To create spectrogram image of the specified sound, you can do by the following 
 
 # Spectrogram markers
 
-In the **Spectrogram markers** module, you can also set up to 10 frequency markers, which will be displayed on the spectrogram and on the filter graph\. To display marker, check the checkbox in the **Marker** column, next to the number from **0** to **9**\. In the **Color** column, you can define the marker color\. The **Value** column determines the place of the marker within filter and spectrogram frequency range\. The value is in one of the following units, which can be choosen in the **Unit** column:
+In the **Spectrogram markers** module, you can also set up to 10 frequency markers, which will be displayed on the spectrogram and on the filter graph\. To display marker, check the checkbox in the **Marker** column, next to the number from **0** to **9**\. In the **Color** column, you can define the marker color\. The **Value** column determines the place of the marker within filter and spectrogram frequency range\. You can change value by clicking the buttons in the **Dec** and **Inc** columns\. The value is in one of the following units, which can be choosen in the **Unit** column:
 
 
 * **Hz** \- The sound frequency value in **Hertz**, to set the specified sound frequency\.
 * **/10000** \- The 1 of 10000 parts, to set the placement as fraction of the whole band\.
 * **/8192** \- The 1 of 8192 parts, to set the placement as fraction of the whole band, the unit can help to place the marker accurately on the spectrogram by frequency pixels\.
+
+At the top of the table, there are the following buttons:
+
+
+* **Settings** \- Show settings panel\.
+* **Step\-** \- Decrease the value changing step in **Dec** and **Inc** columns\.
+* **Step\+** \- Increase the value changing step in **Dec** and **Inc** columns\.
 
 # Spectrogram strip
 

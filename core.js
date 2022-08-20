@@ -1622,6 +1622,7 @@ function SettingsReset(M)
     if (M == 9)
     {
         // marker.js
+        DataDelete("SET_MarkerFreqStep");
         for (var I = 0; I < 10; I++)
         {
             DataDelete("SET_Marker" + I + "Vis");

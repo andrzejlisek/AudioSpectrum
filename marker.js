@@ -4,6 +4,7 @@ var SET_MarkerColorG = [];
 var SET_MarkerColorB = [];
 var SET_MarkerFreq = [];
 var SET_MarkerUnit = [];
+var SET_MarkerFreqStep = 0;
 
 var MarkerFormEvent = false;
 var MarkerChanged = false;
@@ -45,6 +46,15 @@ function MarkerSettingsSet()
     DataSetI("SET_MarkerSThickness", SET_MarkerSThickness);
     MarkerChanged = true;
     MarkerCalc();
+}
+
+function MarkerFormChange(N, V)
+{
+    var ChgStep = StepVal[SET_MarkerFreqStep] * V;
+    var Temp = parseInt(document.getElementById("xSET_Marker" + N + "Freq").value);
+    Temp = Temp + ChgStep;
+    document.getElementById("xSET_Marker" + N + "Freq").value = Temp;
+    MarkerForm(N);
 }
 
 function MarkerForm(N)
@@ -245,8 +255,20 @@ function MarkerCalc()
     }
 }
 
+function MarkerStepChg(V)
+{
+    SET_MarkerFreqStep = Limit(SET_MarkerFreqStep + V, 0, StepVal.length - 1);
+    for (var I = 0; I < 10; I++)
+    {
+        document.getElementById("xSET_Marker" + I + "FreqDec").value = "   -" + StepVal[SET_MarkerFreqStep] + "   ";
+        document.getElementById("xSET_Marker" + I + "FreqInc").value = "   +" + StepVal[SET_MarkerFreqStep] + "   ";
+    }
+}
+
 function MarkerInit()
 {
+    SET_MarkerFreqStep = DataGetIDefault("SET_MarkerFreqStep", 0);
+    MarkerStepChg(0);
     for (var I = 0; I < 10; I++)
     {
         SET_MarkerVis[I] = DataGetIDefault("SET_Marker" + I + "Vis", 0);

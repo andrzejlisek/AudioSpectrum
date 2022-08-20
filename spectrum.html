@@ -1396,7 +1396,7 @@
 
         <!-- Image save begin -->
         <div id="AppSave" style="width:100%;height:500px;border-style:solid;border-width:1px;overflow:scroll;background:white;">
-            Save image<br>
+            <input type="button" value="Settings" onclick="BtnAction(0)">Save image<br>
             Time length: <input type="number" size="5" min="1" id="xSET_SaveLength" onchange="SaveSettingsSet(1)"><br>
             Generation: <select id="xSET_SaveEnabled" onchange="SaveSettingsSet(1)">
                 <option value="0">None</option>
@@ -1437,12 +1437,17 @@
 
         <!-- Spectrogram markers begin -->
         <div id="AppSpecMarker" style="width:100%;height:500px;border-style:solid;border-width:1px;overflow:scroll;background:white;">
+            <input type="button" value="Settings" onclick="BtnAction(0)">
+            <input type="button" value="Step-" id="xSET_MarkerFreqStepDec" onclick="MarkerStepChg(-1)">
+            <input type="button" value="Step+" id="xSET_MarkerFreqStepInc" onclick="MarkerStepChg( 1)">
             <table border="1" cellpadding="0" cellspacing="0">
                 <caption>Frequency markers</caption>
                 <tr>
                     <th colspan="2">Marker</th>
                     <th>Color</th>
                     <th>Value</th>
+                    <th>Dec</th>
+                    <th>Inc</th>
                     <th>Unit</th>
                 </tr>
                 <tr>
@@ -1450,6 +1455,8 @@
                     <td><input type="checkbox" id="xSET_Marker0Vis" onchange="MarkerForm(0)"></td>
                     <td><input type="color" id="xSET_Marker0Color" onchange="MarkerForm(0)"></td>
                     <td><input type="text" size="3" id="xSET_Marker0Freq" onchange="MarkerForm(0)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker0FreqDec" onclick="MarkerFormChange(0, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker0FreqInc" onclick="MarkerFormChange(0,  1)"></td>
                     <td><select id="xSET_Marker0Unit" onchange="MarkerForm(0)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
                 <tr>
@@ -1457,6 +1464,8 @@
                     <td><input type="checkbox" id="xSET_Marker1Vis" onchange="MarkerForm(1)"></td>
                     <td><input type="color" id="xSET_Marker1Color" onchange="MarkerForm(1)"></td>
                     <td><input type="text" size="3" id="xSET_Marker1Freq" onchange="MarkerForm(1)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker1FreqDec" onclick="MarkerFormChange(1, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker1FreqInc" onclick="MarkerFormChange(1,  1)"></td>
                     <td><select id="xSET_Marker1Unit" onchange="MarkerForm(1)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
                 <tr>
@@ -1464,6 +1473,8 @@
                     <td><input type="checkbox" id="xSET_Marker2Vis" onchange="MarkerForm(2)"></td>
                     <td><input type="color" id="xSET_Marker2Color" onchange="MarkerForm(2)"></td>
                     <td><input type="text" size="3" id="xSET_Marker2Freq" onchange="MarkerForm(2)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker2FreqDec" onclick="MarkerFormChange(2, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker2FreqInc" onclick="MarkerFormChange(2,  1)"></td>
                     <td><select id="xSET_Marker2Unit" onchange="MarkerForm(2)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
                 <tr>
@@ -1471,6 +1482,8 @@
                     <td><input type="checkbox" id="xSET_Marker3Vis" onchange="MarkerForm(3)"></td>
                     <td><input type="color" id="xSET_Marker3Color" onchange="MarkerForm(3)"></td>
                     <td><input type="text" size="3" id="xSET_Marker3Freq" onchange="MarkerForm(3)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker3FreqDec" onclick="MarkerFormChange(3, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker3FreqInc" onclick="MarkerFormChange(3,  1)"></td>
                     <td><select id="xSET_Marker3Unit" onchange="MarkerForm(3)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
                 <tr>
@@ -1478,6 +1491,8 @@
                     <td><input type="checkbox" id="xSET_Marker4Vis" onchange="MarkerForm(4)"></td>
                     <td><input type="color" id="xSET_Marker4Color" onchange="MarkerForm(4)"></td>
                     <td><input type="text" size="3" id="xSET_Marker4Freq" onchange="MarkerForm(4)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker4FreqDec" onclick="MarkerFormChange(4, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker4FreqInc" onclick="MarkerFormChange(4,  1)"></td>
                     <td><select id="xSET_Marker4Unit" onchange="MarkerForm(4)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
                 <tr>
@@ -1485,6 +1500,8 @@
                     <td><input type="checkbox" id="xSET_Marker5Vis" onchange="MarkerForm(5)"></td>
                     <td><input type="color" id="xSET_Marker5Color" onchange="MarkerForm(5)"></td>
                     <td><input type="text" size="3" id="xSET_Marker5Freq" onchange="MarkerForm(5)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker5FreqDec" onclick="MarkerFormChange(5, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker5FreqInc" onclick="MarkerFormChange(5,  1)"></td>
                     <td><select id="xSET_Marker5Unit" onchange="MarkerForm(5)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
                 <tr>
@@ -1492,6 +1509,8 @@
                     <td><input type="checkbox" id="xSET_Marker6Vis" onchange="MarkerForm(6)"></td>
                     <td><input type="color" id="xSET_Marker6Color" onchange="MarkerForm(6)"></td>
                     <td><input type="text" size="3" id="xSET_Marker6Freq" onchange="MarkerForm(6)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker6FreqDec" onclick="MarkerFormChange(6, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker6FreqInc" onclick="MarkerFormChange(6,  1)"></td>
                     <td><select id="xSET_Marker6Unit" onchange="MarkerForm(6)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
                 <tr>
@@ -1499,6 +1518,8 @@
                     <td><input type="checkbox" id="xSET_Marker7Vis" onchange="MarkerForm(7)"></td>
                     <td><input type="color" id="xSET_Marker7Color" onchange="MarkerForm(7)"></td>
                     <td><input type="text" size="3" id="xSET_Marker7Freq" onchange="MarkerForm(7)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker7FreqDec" onclick="MarkerFormChange(7, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker7FreqInc" onclick="MarkerFormChange(7,  1)"></td>
                     <td><select id="xSET_Marker7Unit" onchange="MarkerForm(7)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
                 <tr>
@@ -1506,6 +1527,8 @@
                     <td><input type="checkbox" id="xSET_Marker8Vis" onchange="MarkerForm(8)"></td>
                     <td><input type="color" id="xSET_Marker8Color" onchange="MarkerForm(8)"></td>
                     <td><input type="text" size="3" id="xSET_Marker8Freq" onchange="MarkerForm(8)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker8FreqDec" onclick="MarkerFormChange(8, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker8FreqInc" onclick="MarkerFormChange(8,  1)"></td>
                     <td><select id="xSET_Marker8Unit" onchange="MarkerForm(8)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
                 <tr>
@@ -1513,6 +1536,8 @@
                     <td><input type="checkbox" id="xSET_Marker9Vis" onchange="MarkerForm(9)"></td>
                     <td><input type="color" id="xSET_Marker9Color" onchange="MarkerForm(9)"></td>
                     <td><input type="text" size="3" id="xSET_Marker9Freq" onchange="MarkerForm(9)"></td>
+                    <td><input type="button" size="3" value="    -    " id="xSET_Marker9FreqDec" onclick="MarkerFormChange(9, -1)"></td>
+                    <td><input type="button" size="3" value="    +    " id="xSET_Marker9FreqInc" onclick="MarkerFormChange(9,  1)"></td>
                     <td><select id="xSET_Marker9Unit" onchange="MarkerForm(9)"><option>Hz</option><option>/10000</option><option>/8192</option></select></td>
                 </tr>
             </table>
@@ -1521,6 +1546,7 @@
 
         <!-- Spectrogram strip begin -->
         <div id="AppSpecStrip" style="width:100%;height:500px;border-style:solid;border-width:1px;overflow:scroll;background:white;">
+            <input type="button" value="Settings" onclick="BtnAction(0)">
             <table border="2" cellpadding="0" cellspacing="0">
                 <caption>Spectrogram strip coloring</caption>
                 <tr>
